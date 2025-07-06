@@ -4,8 +4,11 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Card, CardContent } from "@/components/ui/card";
 import MediaCard from "@/components/MediaCard";
-import { Search, Filter, SortAsc } from "lucide-react";
+import { Search, Filter, SortAsc, ChevronDown } from "lucide-react";
 
 const Library = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -13,43 +16,12 @@ const Library = () => {
   const [selectedGenre, setSelectedGenre] = useState("all");
   const [sortBy, setSortBy] = useState("title");
   const [watchedFilter, setWatchedFilter] = useState("all");
+  const [backupFilter, setBackupFilter] = useState("all");
+  const [mediaNumberFilter, setMediaNumberFilter] = useState("");
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
-  // Mock data - would come from your data store
-  const [mediaItems, setMediaItems] = useState([
-    {
-      id: "1",
-      title: "The Dark Knight",
-      type: "movie" as const,
-      year: 2008,
-      quality: "4K",
-      genre: ["Action", "Drama", "Crime"],
-      watched: true,
-      backedUp: true,
-      mediaNumber: "001"
-    },
-    {
-      id: "2", 
-      title: "Breaking Bad",
-      type: "tv-series" as const,
-      year: 2008,
-      quality: "1080p",
-      genre: ["Drama", "Crime", "Thriller"],
-      watched: false,
-      backedUp: true,
-      mediaNumber: "002"
-    },
-    {
-      id: "3",
-      title: "Inception",
-      type: "movie" as const,
-      year: 2010,
-      quality: "4K",
-      genre: ["Action", "Sci-Fi", "Thriller"],
-      watched: true,
-      backedUp: false,
-      mediaNumber: "003"
-    }
-  ]);
+  // Mock data - would come from your data store - removed for performance
+  const [mediaItems, setMediaItems] = useState<any[]>([]);
 
   const handleToggleWatched = (id: string) => {
     setMediaItems(items =>
@@ -76,14 +48,18 @@ const Library = () => {
       const matchesWatched = watchedFilter === "all" || 
         (watchedFilter === "watched" && item.watched) ||
         (watchedFilter === "unwatched" && !item.watched);
+      const matchesBackup = backupFilter === "all" ||
+        (backupFilter === "backed-up" && item.backedUp) ||
+        (backupFilter === "not-backed-up" && !item.backedUp);
+      const matchesMediaNumber = !mediaNumberFilter || item.mediaNumber.includes(mediaNumberFilter);
 
-      return matchesType && matchesSearch && matchesQuality && matchesGenre && matchesWatched;
+      return matchesType && matchesSearch && matchesQuality && matchesGenre && matchesWatched && matchesBackup && matchesMediaNumber;
     });
   };
 
   const FilterControls = () => (
     <div className="space-y-4 mb-6">
-      <div className="flex flex-col md:flex-row gap-4">
+      <div className="flex items-center gap-4">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
           <Input
@@ -93,67 +69,140 @@ const Library = () => {
             className="pl-10 bg-surface border-border"
           />
         </div>
-        <Select value={selectedQuality} onValueChange={setSelectedQuality}>
-          <SelectTrigger className="w-full md:w-[140px] bg-surface border-border">
-            <SelectValue placeholder="Quality" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Quality</SelectItem>
-            <SelectItem value="4K">4K</SelectItem>
-            <SelectItem value="1080p">1080p</SelectItem>
-            <SelectItem value="SD">SD</SelectItem>
-          </SelectContent>
-        </Select>
-        <Select value={selectedGenre} onValueChange={setSelectedGenre}>
-          <SelectTrigger className="w-full md:w-[140px] bg-surface border-border">
-            <SelectValue placeholder="Genre" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Genres</SelectItem>
-            <SelectItem value="Action">Action</SelectItem>
-            <SelectItem value="Drama">Drama</SelectItem>
-            <SelectItem value="Comedy">Comedy</SelectItem>
-            <SelectItem value="Sci-Fi">Sci-Fi</SelectItem>
-            <SelectItem value="Horror">Horror</SelectItem>
-          </SelectContent>
-        </Select>
-        <Select value={watchedFilter} onValueChange={setWatchedFilter}>
-          <SelectTrigger className="w-full md:w-[140px] bg-surface border-border">
-            <SelectValue placeholder="Status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Status</SelectItem>
-            <SelectItem value="watched">Watched</SelectItem>
-            <SelectItem value="unwatched">Unwatched</SelectItem>
-          </SelectContent>
-        </Select>
-        <Select value={sortBy} onValueChange={setSortBy}>
-          <SelectTrigger className="w-full md:w-[140px] bg-surface border-border">
-            <SortAsc className="h-4 w-4 mr-2" />
-            <SelectValue placeholder="Sort" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="title">Title</SelectItem>
-            <SelectItem value="year">Release Year</SelectItem>
-            <SelectItem value="added">Date Added</SelectItem>
-          </SelectContent>
-        </Select>
+        
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" className="bg-surface border-border">
+              <Filter className="h-4 w-4 mr-2" />
+              Filters
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-80 bg-surface-elevated border-border" align="end">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Quality</label>
+                <Select value={selectedQuality} onValueChange={setSelectedQuality}>
+                  <SelectTrigger className="bg-surface border-border">
+                    <SelectValue placeholder="Quality" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Quality</SelectItem>
+                    <SelectItem value="4K">4K</SelectItem>
+                    <SelectItem value="1080p">1080p</SelectItem>
+                    <SelectItem value="SD">SD</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Genre</label>
+                <Select value={selectedGenre} onValueChange={setSelectedGenre}>
+                  <SelectTrigger className="bg-surface border-border">
+                    <SelectValue placeholder="Genre" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Genres</SelectItem>
+                    <SelectItem value="Action">Action</SelectItem>
+                    <SelectItem value="Drama">Drama</SelectItem>
+                    <SelectItem value="Comedy">Comedy</SelectItem>
+                    <SelectItem value="Sci-Fi">Sci-Fi</SelectItem>
+                    <SelectItem value="Horror">Horror</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Watch Status</label>
+                <Select value={watchedFilter} onValueChange={setWatchedFilter}>
+                  <SelectTrigger className="bg-surface border-border">
+                    <SelectValue placeholder="Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Status</SelectItem>
+                    <SelectItem value="watched">Watched</SelectItem>
+                    <SelectItem value="unwatched">Unwatched</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Backup Status</label>
+                <Select value={backupFilter} onValueChange={setBackupFilter}>
+                  <SelectTrigger className="bg-surface border-border">
+                    <SelectValue placeholder="Backup" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All</SelectItem>
+                    <SelectItem value="backed-up">Backed Up</SelectItem>
+                    <SelectItem value="not-backed-up">Not Backed Up</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2 col-span-2">
+                <label className="text-sm font-medium">Media Number</label>
+                <Input
+                  placeholder="Filter by media number..."
+                  value={mediaNumberFilter}
+                  onChange={(e) => setMediaNumberFilter(e.target.value)}
+                  className="bg-surface border-border"
+                />
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
+
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline" className="bg-surface border-border">
+              <SortAsc className="h-4 w-4 mr-2" />
+              Sort
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-48 bg-surface-elevated border-border" align="end">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Sort by</label>
+              <Select value={sortBy} onValueChange={setSortBy}>
+                <SelectTrigger className="bg-surface border-border">
+                  <SelectValue placeholder="Sort" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="title">Title</SelectItem>
+                  <SelectItem value="year">Release Year</SelectItem>
+                  <SelectItem value="added">Date Added</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </PopoverContent>
+        </Popover>
       </div>
     </div>
   );
 
-  const MediaGrid = ({ items }: { items: typeof mediaItems }) => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      {items.map((item) => (
-        <MediaCard
-          key={item.id}
-          media={item}
-          onToggleWatched={handleToggleWatched}
-          onToggleBackup={handleToggleBackup}
-        />
-      ))}
-    </div>
-  );
+  const MediaGrid = ({ items }: { items: typeof mediaItems }) => {
+    if (items.length === 0) {
+      return (
+        <Card className="bg-surface-elevated border-border p-8 text-center">
+          <CardContent>
+            <p className="text-muted-foreground">No media items found. Add some media to get started!</p>
+          </CardContent>
+        </Card>
+      );
+    }
+
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {items.map((item) => (
+          <MediaCard
+            key={item.id}
+            media={item}
+            onToggleWatched={handleToggleWatched}
+            onToggleBackup={handleToggleBackup}
+          />
+        ))}
+      </div>
+    );
+  };
 
   return (
     <div className="container mx-auto px-4 py-8">

@@ -75,7 +75,7 @@ const Dashboard = () => {
         </div>
 
         {/* Charts and Additional Info */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <Card className="bg-surface-elevated border-border">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
@@ -120,6 +120,35 @@ const Dashboard = () => {
                     </div>
                     <span className="text-sm text-muted-foreground">{stats.totalSD}</span>
                   </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-surface-elevated border-border">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <Database className="h-5 w-5 text-accent" />
+                <span>Backup Status</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-foreground mb-2">
+                    {Math.round((stats.totalBackedUp / (stats.totalBackedUp + stats.totalToBackup)) * 100)}%
+                  </div>
+                  <p className="text-muted-foreground">of collection backed up</p>
+                </div>
+                <div className="w-full bg-secondary rounded-full h-4">
+                  <div
+                    className="bg-gradient-to-r from-accent to-primary h-4 rounded-full transition-all duration-500"
+                    style={{ width: `${(stats.totalBackedUp / (stats.totalBackedUp + stats.totalToBackup)) * 100}%` }}
+                  ></div>
+                </div>
+                <div className="flex justify-between text-sm text-muted-foreground">
+                  <span>{stats.totalBackedUp} backed up</span>
+                  <span>{stats.totalToBackup} pending</span>
                 </div>
               </div>
             </CardContent>

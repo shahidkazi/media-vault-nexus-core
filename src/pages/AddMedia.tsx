@@ -26,9 +26,11 @@ const AddMedia = () => {
     fileSize: "",
     edition: "",
     director: "",
+    onlineRating: "",
     description: "",
     watched: false,
     backedUp: false,
+    pendingBackup: false,
     loaned: false,
     loanedTo: ""
   });
@@ -74,9 +76,11 @@ const AddMedia = () => {
       fileSize: "",
       edition: "",
       director: "",
+      onlineRating: "",
       description: "",
       watched: false,
       backedUp: false,
+      pendingBackup: false,
       loaned: false,
       loanedTo: ""
     });
@@ -163,7 +167,7 @@ const AddMedia = () => {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div className="space-y-2">
                         <Label htmlFor="year">Release Year</Label>
                         <Input
@@ -180,6 +184,16 @@ const AddMedia = () => {
                           id="director"
                           value={formData.director}
                           onChange={(e) => handleInputChange("director", e.target.value)}
+                          className="bg-surface border-border"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="onlineRating">Online Rating</Label>
+                        <Input
+                          id="onlineRating"
+                          placeholder="e.g., 8.5/10"
+                          value={formData.onlineRating}
+                          onChange={(e) => handleInputChange("onlineRating", e.target.value)}
                           className="bg-surface border-border"
                         />
                       </div>
@@ -297,6 +311,15 @@ const AddMedia = () => {
                           onCheckedChange={(checked) => handleInputChange("backedUp", checked)}
                         />
                         <Label htmlFor="backedUp">Backed Up</Label>
+                      </div>
+
+                      <div className="flex items-center space-x-2">
+                        <Checkbox
+                          id="pendingBackup"
+                          checked={formData.pendingBackup}
+                          onCheckedChange={(checked) => handleInputChange("pendingBackup", checked)}
+                        />
+                        <Label htmlFor="pendingBackup">Pending Backup</Label>
                       </div>
 
                       <div className="space-y-2">

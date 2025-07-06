@@ -1,11 +1,12 @@
 import { NavLink } from "react-router-dom";
-import { BarChart3, Film, Plus, Settings } from "lucide-react";
+import { BarChart3, Film, Plus, Settings, Database } from "lucide-react";
 
 const Navigation = () => {
   const navItems = [
     { to: "/", icon: BarChart3, label: "Dashboard" },
     { to: "/library", icon: Film, label: "Library" },
     { to: "/add-media", icon: Plus, label: "Add Media" },
+    { to: "/burn", icon: Database, label: "Burn" },
     { to: "/settings", icon: Settings, label: "Settings" },
   ];
 
@@ -40,7 +41,7 @@ const Navigation = () => {
         </div>
         
         {/* Mobile navigation */}
-        <div className="md:hidden flex justify-around py-2 border-t border-border">
+        <div className="md:hidden grid grid-cols-5 py-2 border-t border-border">
           {navItems.map(({ to, icon: Icon, label }) => (
             <NavLink
               key={to}

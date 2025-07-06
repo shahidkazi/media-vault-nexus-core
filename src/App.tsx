@@ -7,6 +7,7 @@ import Navigation from "./components/Navigation";
 import Dashboard from "./pages/Dashboard";
 import Library from "./pages/Library";
 import AddMedia from "./pages/AddMedia";
+import Burn from "./pages/Burn";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
@@ -24,6 +25,7 @@ const App = () => (
             <Route path="/" element={<Dashboard />} />
             <Route path="/library" element={<Library />} />
             <Route path="/add-media" element={<AddMedia />} />
+            <Route path="/burn" element={<Burn />} />
             <Route path="/settings" element={<Settings />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
