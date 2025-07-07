@@ -17,6 +17,25 @@ const AddMedia = () => {
   const [genres, setGenres] = useState<string[]>([]);
   const [newGenre, setNewGenre] = useState("");
 
+  const [cast, setCast] = useState<Array<{ character: string; actor: string }>>([]);
+  const [episodes, setEpisodes] = useState<Array<{ 
+    season: number; 
+    episode: number; 
+    title: string; 
+    plot: string; 
+    watched: boolean; 
+    backedUp: boolean 
+  }>>([]);
+  const [newCastMember, setNewCastMember] = useState({ character: "", actor: "" });
+  const [newEpisode, setNewEpisode] = useState({ 
+    season: 1, 
+    episode: 1, 
+    title: "", 
+    plot: "", 
+    watched: false, 
+    backedUp: false 
+  });
+
   const [formData, setFormData] = useState({
     title: "",
     type: "",
@@ -48,6 +67,35 @@ const AddMedia = () => {
 
   const removeGenre = (genre: string) => {
     setGenres(prev => prev.filter(g => g !== genre));
+  };
+
+  const addCastMember = () => {
+    if (newCastMember.character.trim() && newCastMember.actor.trim()) {
+      setCast(prev => [...prev, { ...newCastMember }]);
+      setNewCastMember({ character: "", actor: "" });
+    }
+  };
+
+  const removeCastMember = (index: number) => {
+    setCast(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const addEpisode = () => {
+    if (newEpisode.title.trim()) {
+      setEpisodes(prev => [...prev, { ...newEpisode }]);
+      setNewEpisode(prev => ({ 
+        ...prev, 
+        episode: prev.episode + 1, 
+        title: "", 
+        plot: "", 
+        watched: false, 
+        backedUp: false 
+      }));
+    }
+  };
+
+  const removeEpisode = (index: number) => {
+    setEpisodes(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleTMDBSearch = () => {
@@ -85,6 +133,8 @@ const AddMedia = () => {
       loanedTo: ""
     });
     setGenres([]);
+    setCast([]);
+    setEpisodes([]);
   };
 
   return (
@@ -134,9 +184,11 @@ const AddMedia = () => {
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
                 <Tabs defaultValue="basic" className="w-full">
-                  <TabsList className="grid w-full grid-cols-3 bg-surface border border-border">
+                  <TabsList className="grid w-full grid-cols-5 bg-surface border border-border">
                     <TabsTrigger value="basic">Basic Info</TabsTrigger>
                     <TabsTrigger value="details">Details</TabsTrigger>
+                    <TabsTrigger value="cast">Cast</TabsTrigger>
+                    <TabsTrigger value="episodes" disabled={formData.type === "movie"}>Episodes</TabsTrigger>
                     <TabsTrigger value="status">Status</TabsTrigger>
                   </TabsList>
 
@@ -290,6 +342,172 @@ const AddMedia = () => {
                           placeholder="e.g., Director's Cut, Extended"
                         />
                       </div>
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="cast" className="space-y-4">
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="character">Character</Label>
+                          <Input
+                            id="character"
+                            placeholder="Character name"
+                            value={newCastMember.character}
+                            onChange={(e) => setNewCastMember(prev => ({ ...prev, character: e.target.value }))}
+                            className="bg-surface border-border"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="actor">Actor</Label>
+                          <div className="flex space-x-2">
+                            <Input
+                              id="actor"
+                              placeholder="Actor name"
+                              value={newCastMember.actor}
+                              onChange={(e) => setNewCastMember(prev => ({ ...prev, actor: e.target.value }))}
+                              className="bg-surface border-border"
+                            />
+                            <Button type="button" onClick={addCastMember}>
+                              <Plus className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+
+                      {cast.length > 0 && (
+                        <div className="space-y-2">
+                          <Label>Cast Members</Label>
+                          <div className="space-y-2">
+                            {cast.map((member, index) => (
+                              <div key={index} className="flex items-center justify-between p-3 bg-surface rounded-md border border-border">
+                                <div>
+                                  <span className="font-medium">{member.character}</span>
+                                  <span className="text-muted-foreground"> - {member.actor}</span>
+                                </div>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => removeCastMember(index)}
+                                >
+                                  <X className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </TabsContent>
+
+                  <TabsContent value="episodes" className="space-y-4">
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="season">Season #</Label>
+                          <Input
+                            id="season"
+                            type="number"
+                            min="1"
+                            value={newEpisode.season}
+                            onChange={(e) => setNewEpisode(prev => ({ ...prev, season: parseInt(e.target.value) || 1 }))}
+                            className="bg-surface border-border"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="episodeNum">Episode #</Label>
+                          <Input
+                            id="episodeNum"
+                            type="number"
+                            min="1"
+                            value={newEpisode.episode}
+                            onChange={(e) => setNewEpisode(prev => ({ ...prev, episode: parseInt(e.target.value) || 1 }))}
+                            className="bg-surface border-border"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="episodeTitle">Episode Title</Label>
+                          <Input
+                            id="episodeTitle"
+                            placeholder="Episode title"
+                            value={newEpisode.title}
+                            onChange={(e) => setNewEpisode(prev => ({ ...prev, title: e.target.value }))}
+                            className="bg-surface border-border"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>&nbsp;</Label>
+                          <Button type="button" onClick={addEpisode} className="w-full">
+                            <Plus className="h-4 w-4 mr-2" />
+                            Add Episode
+                          </Button>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="episodePlot">Episode Plot</Label>
+                        <Textarea
+                          id="episodePlot"
+                          placeholder="Episode plot summary"
+                          value={newEpisode.plot}
+                          onChange={(e) => setNewEpisode(prev => ({ ...prev, plot: e.target.value }))}
+                          className="bg-surface border-border"
+                          rows={2}
+                        />
+                      </div>
+
+                      <div className="flex space-x-4">
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="episodeWatched"
+                            checked={newEpisode.watched}
+                            onCheckedChange={(checked) => setNewEpisode(prev => ({ ...prev, watched: !!checked }))}
+                          />
+                          <Label htmlFor="episodeWatched">Watched</Label>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <Checkbox
+                            id="episodeBackedUp"
+                            checked={newEpisode.backedUp}
+                            onCheckedChange={(checked) => setNewEpisode(prev => ({ ...prev, backedUp: !!checked }))}
+                          />
+                          <Label htmlFor="episodeBackedUp">Backed Up</Label>
+                        </div>
+                      </div>
+
+                      {episodes.length > 0 && (
+                        <div className="space-y-2">
+                          <Label>Episodes</Label>
+                          <div className="space-y-2 max-h-64 overflow-y-auto">
+                            {episodes.map((episode, index) => (
+                              <div key={index} className="flex items-center justify-between p-3 bg-surface rounded-md border border-border">
+                                <div className="flex-1">
+                                  <div className="flex items-center space-x-2">
+                                    <span className="font-medium">S{episode.season}E{episode.episode}</span>
+                                    <span>{episode.title}</span>
+                                    <div className="flex space-x-1">
+                                      {episode.watched && <Badge variant="secondary" className="text-xs">Watched</Badge>}
+                                      {episode.backedUp && <Badge variant="secondary" className="text-xs">Backed Up</Badge>}
+                                    </div>
+                                  </div>
+                                  {episode.plot && (
+                                    <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{episode.plot}</p>
+                                  )}
+                                </div>
+                                <Button
+                                  type="button"
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => removeEpisode(index)}
+                                >
+                                  <X className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </TabsContent>
 

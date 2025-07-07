@@ -12,7 +12,7 @@ interface MediaItem {
   genre: string[];
   watched: boolean;
   backedUp: boolean;
-  posterUrl?: string;
+  poster?: string;
   mediaNumber?: string;
 }
 
@@ -20,9 +20,10 @@ interface MediaCardProps {
   media: MediaItem;
   onToggleWatched: (id: string) => void;
   onToggleBackup: (id: string) => void;
+  onClick?: (id: string) => void;
 }
 
-const MediaCard = ({ media, onToggleWatched, onToggleBackup }: MediaCardProps) => {
+const MediaCard = ({ media, onToggleWatched, onToggleBackup, onClick }: MediaCardProps) => {
   const getTypeIcon = () => {
     switch (media.type) {
       case "movie":
@@ -48,14 +49,34 @@ const MediaCard = ({ media, onToggleWatched, onToggleBackup }: MediaCardProps) =
 
   return (
     <Card className="bg-surface-elevated border-border hover:shadow-lg transition-all duration-200 hover:scale-105">
-      <CardContent className="p-4">
-        <div className="flex items-start justify-between mb-3">
-          <div className="flex items-center space-x-2">
-            {getTypeIcon()}
-            <h3 className="font-semibold text-foreground line-clamp-1">{media.title}</h3>
-          </div>
-          <span className="text-sm text-muted-foreground">{media.year}</span>
+      <CardContent className="p-0">
+        {/* Poster */}
+        <div 
+          className="aspect-[2/3] bg-surface rounded-t-lg overflow-hidden cursor-pointer"
+          onClick={() => onClick?.(media.id)}
+        >
+          {media.poster ? (
+            <img
+              src={media.poster}
+              alt={media.title}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              {getTypeIcon()}
+            </div>
+          )}
         </div>
+
+        {/* Content */}
+        <div className="p-4">
+          <div 
+            className="mb-3 cursor-pointer" 
+            onClick={() => onClick?.(media.id)}
+          >
+            <h3 className="font-semibold text-foreground line-clamp-1 mb-1">{media.title}</h3>
+            <span className="text-sm text-muted-foreground">{media.year}</span>
+          </div>
         
         <div className="flex flex-wrap gap-2 mb-3">
           <Badge className={getQualityColor(media.quality)}>
@@ -91,6 +112,7 @@ const MediaCard = ({ media, onToggleWatched, onToggleBackup }: MediaCardProps) =
             >
               <Database className="h-3 w-3" />
             </Button>
+          </div>
           </div>
         </div>
       </CardContent>

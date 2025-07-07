@@ -10,6 +10,7 @@ import AddMedia from "./pages/AddMedia";
 import Burn from "./pages/Burn";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import MediaDetailsPage from "./pages/MediaDetailsPage";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +28,7 @@ const App = () => (
             <Route path="/add-media" element={<AddMedia />} />
             <Route path="/burn" element={<Burn />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/media/:id" element={<MediaDetailsPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
