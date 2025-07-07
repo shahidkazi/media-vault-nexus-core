@@ -15,13 +15,90 @@ const Library = () => {
   const [selectedQuality, setSelectedQuality] = useState("all");
   const [selectedGenre, setSelectedGenre] = useState("all");
   const [sortBy, setSortBy] = useState("title");
+  const [sortOrder, setSortOrder] = useState("asc");
   const [watchedFilter, setWatchedFilter] = useState("all");
   const [backupFilter, setBackupFilter] = useState("all");
   const [mediaNumberFilter, setMediaNumberFilter] = useState("");
   const [filtersOpen, setFiltersOpen] = useState(false);
 
-  // Mock data - would come from your data store - removed for performance
-  const [mediaItems, setMediaItems] = useState<any[]>([]);
+  // Sample data
+  const [mediaItems, setMediaItems] = useState<any[]>([
+    {
+      id: "1",
+      title: "The Dark Knight",
+      type: "movie",
+      year: 2008,
+      genre: ["Action", "Drama"],
+      quality: "4K",
+      watched: true,
+      backedUp: true,
+      mediaNumber: "M001",
+      poster: "/placeholder.svg",
+      rating: 9.0,
+      fileSize: "8.5 GB"
+    },
+    {
+      id: "2", 
+      title: "Inception",
+      type: "movie",
+      year: 2010,
+      genre: ["Sci-Fi", "Action"],
+      quality: "1080p",
+      watched: false,
+      backedUp: false,
+      mediaNumber: "M002",
+      poster: "/placeholder.svg",
+      rating: 8.8,
+      fileSize: "4.2 GB"
+    },
+    {
+      id: "3",
+      title: "Breaking Bad",
+      type: "tv-series",
+      year: 2008,
+      genre: ["Drama", "Crime"],
+      quality: "1080p", 
+      watched: true,
+      backedUp: true,
+      mediaNumber: "TV001",
+      poster: "/placeholder.svg",
+      rating: 9.5,
+      fileSize: "45.8 GB",
+      seasons: 5,
+      episodes: 62
+    },
+    {
+      id: "4",
+      title: "Chernobyl",
+      type: "mini-series",
+      year: 2019,
+      genre: ["Drama", "History"],
+      quality: "4K",
+      watched: false,
+      backedUp: false,
+      mediaNumber: "MS001", 
+      poster: "/placeholder.svg",
+      rating: 9.3,
+      fileSize: "12.4 GB",
+      episodes: 5
+    },
+    {
+      id: "5",
+      title: "Stranger Things",
+      type: "tv-series",
+      year: 2016,
+      genre: ["Sci-Fi", "Horror"],
+      quality: "4K",
+      watched: true,
+      backedUp: false,
+      mediaNumber: "TV002",
+      poster: "/placeholder.svg", 
+      rating: 8.7,
+      fileSize: "78.2 GB",
+      seasons: 4,
+      episodes: 34
+    }
+  ]);
 
   const handleToggleWatched = (id: string) => {
     setMediaItems(items =>
@@ -40,7 +117,7 @@ const Library = () => {
   };
 
   const filteredItems = (type?: string) => {
-    return mediaItems.filter(item => {
+    let filtered = mediaItems.filter(item => {
       const matchesType = !type || item.type === type;
       const matchesSearch = item.title.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesQuality = selectedQuality === "all" || item.quality === selectedQuality;
@@ -55,11 +132,38 @@ const Library = () => {
 
       return matchesType && matchesSearch && matchesQuality && matchesGenre && matchesWatched && matchesBackup && matchesMediaNumber;
     });
+
+    // Apply sorting
+    return filtered.sort((a, b) => {
+      let aValue, bValue;
+      switch (sortBy) {
+        case "title":
+          aValue = a.title.toLowerCase();
+          bValue = b.title.toLowerCase();
+          break;
+        case "year":
+          aValue = a.year;
+          bValue = b.year;
+          break;
+        case "added":
+          aValue = a.id; // Using ID as proxy for date added
+          bValue = b.id;
+          break;
+        default:
+          return 0;
+      }
+      
+      if (sortOrder === "asc") {
+        return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+      } else {
+        return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+      }
+    });
   };
 
   const FilterControls = () => (
     <div className="space-y-4 mb-6">
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-2">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
           <Input
@@ -72,9 +176,8 @@ const Library = () => {
         
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" className="bg-surface border-border">
-              <Filter className="h-4 w-4 mr-2" />
-              Filters
+            <Button variant="outline" size="icon" className="bg-surface border-border">
+              <Filter className="h-4 w-4" />
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-80 bg-surface-elevated border-border" align="end">
@@ -154,24 +257,37 @@ const Library = () => {
 
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" className="bg-surface border-border">
-              <SortAsc className="h-4 w-4 mr-2" />
-              Sort
+            <Button variant="outline" size="icon" className="bg-surface border-border">
+              <SortAsc className="h-4 w-4" />
             </Button>
           </PopoverTrigger>
           <PopoverContent className="w-48 bg-surface-elevated border-border" align="end">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Sort by</label>
-              <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="bg-surface border-border">
-                  <SelectValue placeholder="Sort" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="title">Title</SelectItem>
-                  <SelectItem value="year">Release Year</SelectItem>
-                  <SelectItem value="added">Date Added</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Sort by</label>
+                <Select value={sortBy} onValueChange={setSortBy}>
+                  <SelectTrigger className="bg-surface border-border">
+                    <SelectValue placeholder="Sort" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="title">Title</SelectItem>
+                    <SelectItem value="year">Release Year</SelectItem>
+                    <SelectItem value="added">Date Added</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Order</label>
+                <Select value={sortOrder} onValueChange={setSortOrder}>
+                  <SelectTrigger className="bg-surface border-border">
+                    <SelectValue placeholder="Order" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="asc">Ascending</SelectItem>
+                    <SelectItem value="desc">Descending</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </PopoverContent>
         </Popover>
@@ -211,9 +327,8 @@ const Library = () => {
         <p className="text-muted-foreground">Browse and manage your media collection</p>
       </div>
 
-      <Tabs defaultValue="all" className="w-full">
-        <TabsList className="grid w-full grid-cols-4 bg-surface-elevated border border-border">
-          <TabsTrigger value="all">All Media</TabsTrigger>
+      <Tabs defaultValue="movie" className="w-full">
+        <TabsList className="grid w-full grid-cols-3 bg-surface-elevated border border-border">
           <TabsTrigger value="movie">Movies</TabsTrigger>
           <TabsTrigger value="tv-series">TV Series</TabsTrigger>
           <TabsTrigger value="mini-series">Mini Series</TabsTrigger>
@@ -222,13 +337,6 @@ const Library = () => {
         <div className="mt-6">
           <FilterControls />
         </div>
-
-        <TabsContent value="all">
-          <div className="mb-4">
-            <Badge variant="secondary">{filteredItems().length} items</Badge>
-          </div>
-          <MediaGrid items={filteredItems()} />
-        </TabsContent>
 
         <TabsContent value="movie">
           <div className="mb-4">

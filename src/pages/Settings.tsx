@@ -58,11 +58,11 @@ const Settings = () => {
         <p className="text-muted-foreground">Manage your Media Vault preferences and data</p>
       </div>
 
-      <Tabs defaultValue="import-export" className="w-full">
+      <Tabs defaultValue="general" className="w-full">
         <TabsList className="grid w-full grid-cols-3 bg-surface-elevated border border-border">
-          <TabsTrigger value="import-export">Import/Export</TabsTrigger>
-          <TabsTrigger value="backup">Backup & Restore</TabsTrigger>
           <TabsTrigger value="general">General</TabsTrigger>
+          <TabsTrigger value="import-export">Import/Export</TabsTrigger>
+          <TabsTrigger value="backup">Backup</TabsTrigger>
         </TabsList>
 
         <TabsContent value="import-export" className="space-y-6">
@@ -164,6 +164,63 @@ const Settings = () => {
           </div>
         </TabsContent>
 
+        <TabsContent value="general" className="space-y-6">
+          <Card className="bg-surface-elevated border-border">
+            <CardHeader>
+              <CardTitle className="flex items-center space-x-2">
+                <SettingsIcon className="h-5 w-5 text-accent" />
+                <span>General Settings</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="default-quality">Default Quality</Label>
+                  <select 
+                    id="default-quality"
+                    className="w-full px-3 py-2 bg-surface border border-border rounded-md text-foreground"
+                  >
+                    <option value="4K">4K Ultra HD</option>
+                    <option value="1080p">1080p HD</option>
+                    <option value="720p">720p HD</option>
+                    <option value="SD">Standard Definition</option>
+                  </select>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="items-per-page">Items per Page</Label>
+                  <select 
+                    id="items-per-page"
+                    className="w-full px-3 py-2 bg-surface border border-border rounded-md text-foreground"
+                  >
+                    <option value="12">12</option>
+                    <option value="24">24</option>
+                    <option value="48">48</option>
+                    <option value="96">96</option>
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="tmdb-api">TMDB API Key</Label>
+                  <Input
+                    id="tmdb-api"
+                    type="password"
+                    placeholder="Enter your TMDB API key"
+                    className="bg-surface border-border"
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Required for automatic metadata fetching
+                  </p>
+                </div>
+              </div>
+              
+              <Button className="w-full bg-primary hover:bg-primary/90">
+                Save Settings
+              </Button>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
         <TabsContent value="backup" className="space-y-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Backup */}
@@ -244,62 +301,6 @@ const Settings = () => {
           </div>
         </TabsContent>
 
-        <TabsContent value="general" className="space-y-6">
-          <Card className="bg-surface-elevated border-border">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2">
-                <SettingsIcon className="h-5 w-5 text-accent" />
-                <span>General Settings</span>
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="default-quality">Default Quality</Label>
-                  <select 
-                    id="default-quality"
-                    className="w-full px-3 py-2 bg-surface border border-border rounded-md text-foreground"
-                  >
-                    <option value="4K">4K Ultra HD</option>
-                    <option value="1080p">1080p HD</option>
-                    <option value="720p">720p HD</option>
-                    <option value="SD">Standard Definition</option>
-                  </select>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="items-per-page">Items per Page</Label>
-                  <select 
-                    id="items-per-page"
-                    className="w-full px-3 py-2 bg-surface border border-border rounded-md text-foreground"
-                  >
-                    <option value="12">12</option>
-                    <option value="24">24</option>
-                    <option value="48">48</option>
-                    <option value="96">96</option>
-                  </select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="tmdb-api">TMDB API Key</Label>
-                  <Input
-                    id="tmdb-api"
-                    type="password"
-                    placeholder="Enter your TMDB API key"
-                    className="bg-surface border-border"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Required for automatic metadata fetching
-                  </p>
-                </div>
-              </div>
-              
-              <Button className="w-full bg-primary hover:bg-primary/90">
-                Save Settings
-              </Button>
-            </CardContent>
-          </Card>
-        </TabsContent>
       </Tabs>
     </div>
   );
