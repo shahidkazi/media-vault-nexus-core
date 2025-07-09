@@ -94,9 +94,9 @@ const MediaDetails = ({ media, onToggleWatched, onToggleBackup }: MediaDetailsPr
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
         {/* Poster and Quick Actions */}
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-2">
           <Card className="bg-surface-elevated border-border">
             <CardContent className="p-6">
               <div className="space-y-4">
@@ -104,10 +104,10 @@ const MediaDetails = ({ media, onToggleWatched, onToggleBackup }: MediaDetailsPr
                   <img
                     src={media.poster}
                     alt={media.title}
-                    className="w-full aspect-[2/3] object-cover rounded-lg bg-surface"
+                    className="w-full aspect-[2/3] object-cover rounded-lg bg-surface lg:max-w-sm mx-auto"
                   />
                 ) : (
-                  <div className="w-full aspect-[2/3] bg-surface rounded-lg flex items-center justify-center">
+                  <div className="w-full aspect-[2/3] bg-surface rounded-lg flex items-center justify-center lg:max-w-sm mx-auto">
                     {getTypeIcon()}
                   </div>
                 )}
@@ -136,7 +136,7 @@ const MediaDetails = ({ media, onToggleWatched, onToggleBackup }: MediaDetailsPr
         </div>
 
         {/* Main Details */}
-        <div className="lg:col-span-2">
+        <div className="lg:col-span-3">
           <Card className="bg-surface-elevated border-border">
             <CardHeader>
               <div className="flex items-center space-x-2 mb-2">
