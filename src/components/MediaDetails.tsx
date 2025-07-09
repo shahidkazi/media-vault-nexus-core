@@ -143,25 +143,29 @@ const MediaDetails = ({ media, onToggleWatched, onToggleBackup }: MediaDetailsPr
                 {getTypeIcon()}
                 <CardTitle className="text-2xl">{media.title}</CardTitle>
               </div>
-              <div className="flex flex-wrap gap-2">
-                <Badge className={getQualityColor(media.quality)}>
-                  {media.quality}
-                </Badge>
-                {media.genre.map((genre) => (
-                  <Badge key={genre} variant="outline">
-                    {genre}
+              <div className="space-y-3">
+                <div className="flex flex-wrap gap-2">
+                  {media.genre.map((genre) => (
+                    <Badge key={genre} variant="outline">
+                      {genre}
+                    </Badge>
+                  ))}
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  <Badge className={getQualityColor(media.quality)}>
+                    {media.quality}
                   </Badge>
-                ))}
-                {media.mediaNumber && (
-                  <Badge variant="secondary">
-                    #{media.mediaNumber}
-                  </Badge>
-                )}
-                {media.pendingBackup && (
-                  <Badge variant="destructive">
-                    Pending Backup
-                  </Badge>
-                )}
+                  {media.mediaNumber && (
+                    <Badge variant="secondary">
+                      #{media.mediaNumber}
+                    </Badge>
+                  )}
+                  {media.pendingBackup && (
+                    <Badge variant="destructive">
+                      Pending Backup
+                    </Badge>
+                  )}
+                </div>
               </div>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -250,47 +254,88 @@ const MediaDetails = ({ media, onToggleWatched, onToggleBackup }: MediaDetailsPr
             {Object.entries(groupedEpisodes)
               .sort(([a], [b]) => parseInt(a) - parseInt(b))
               .map(([season, episodes]) => (
-                <div key={season} className="mb-6 last:mb-0">
-                  <h3 className="font-semibold text-lg mb-3">Season {season}</h3>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead className="w-20">Episode</TableHead>
-                        <TableHead>Title</TableHead>
-                        <TableHead className="hidden md:table-cell">Plot</TableHead>
-                        <TableHead className="w-24">Status</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {episodes
-                        .sort((a, b) => a.episode - b.episode)
-                        .map((episode, index) => (
-                          <TableRow key={index}>
-                            <TableCell className="font-medium">E{episode.episode}</TableCell>
-                            <TableCell>{episode.title}</TableCell>
-                            <TableCell className="hidden md:table-cell text-muted-foreground">
-                              {episode.plot && (
-                                <span className="line-clamp-2">{episode.plot}</span>
-                              )}
-                            </TableCell>
-                            <TableCell>
-                              <div className="flex flex-col space-y-1">
+                <div key={season} className="mb-8 last:mb-0">
+                  <h3 className="font-semibold text-lg mb-4">Season {season}</h3>
+                  
+                  {/* Desktop Table View */}
+                  <div className="hidden md:block">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="w-20">Episode</TableHead>
+                          <TableHead>Title</TableHead>
+                          <TableHead>Plot</TableHead>
+                          <TableHead className="w-24">Status</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {episodes
+                          .sort((a, b) => a.episode - b.episode)
+                          .map((episode, index) => (
+                            <TableRow key={index}>
+                              <TableCell className="font-medium">E{episode.episode}</TableCell>
+                              <TableCell>{episode.title}</TableCell>
+                              <TableCell className="text-muted-foreground">
+                                {episode.plot && (
+                                  <span className="line-clamp-2">{episode.plot}</span>
+                                )}
+                              </TableCell>
+                              <TableCell>
+                                <div className="flex flex-col space-y-1">
+                                  {episode.watched && (
+                                    <Badge variant="secondary" className="text-xs w-fit">
+                                      Watched
+                                    </Badge>
+                                  )}
+                                  {episode.backedUp && (
+                                    <Badge variant="secondary" className="text-xs w-fit">
+                                      Backed Up
+                                    </Badge>
+                                  )}
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+
+                  {/* Mobile Card View */}
+                  <div className="md:hidden space-y-3">
+                    {episodes
+                      .sort((a, b) => a.episode - b.episode)
+                      .map((episode, index) => (
+                        <Card key={index} className="bg-surface border-border">
+                          <CardContent className="p-4">
+                            <div className="flex items-start justify-between mb-2">
+                              <div className="flex items-center space-x-2">
+                                <Badge variant="outline" className="text-xs">
+                                  E{episode.episode}
+                                </Badge>
+                                <span className="font-medium text-sm">{episode.title}</span>
+                              </div>
+                              <div className="flex flex-wrap gap-1">
                                 {episode.watched && (
-                                  <Badge variant="secondary" className="text-xs w-fit">
+                                  <Badge variant="secondary" className="text-xs">
                                     Watched
                                   </Badge>
                                 )}
                                 {episode.backedUp && (
-                                  <Badge variant="secondary" className="text-xs w-fit">
+                                  <Badge variant="secondary" className="text-xs">
                                     Backed Up
                                   </Badge>
                                 )}
                               </div>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                    </TableBody>
-                  </Table>
+                            </div>
+                            {episode.plot && (
+                              <p className="text-sm text-muted-foreground line-clamp-3">
+                                {episode.plot}
+                              </p>
+                            )}
+                          </CardContent>
+                        </Card>
+                      ))}
+                  </div>
                 </div>
               ))}
           </CardContent>

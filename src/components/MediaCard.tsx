@@ -52,7 +52,7 @@ const MediaCard = ({ media, onToggleWatched, onToggleBackup, onClick }: MediaCar
       <CardContent className="p-0">
         {/* Poster */}
         <div 
-          className="aspect-[2/3] bg-surface rounded-t-lg overflow-hidden cursor-pointer"
+          className="aspect-[3/4] bg-surface rounded-t-lg overflow-hidden cursor-pointer"
           onClick={() => onClick?.(media.id)}
         >
           {media.poster ? (
