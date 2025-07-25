@@ -1,7 +1,7 @@
 import StatsCard from "@/components/StatsCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Film, Tv, Database, Eye, EyeOff, TrendingUp } from "lucide-react";
-import heroImage from "@/assets/media-vault-hero.jpg";
+import heroImage from "@/assets/movie-hero.jpg";
 
 const Dashboard = () => {
   // Mock data - would come from your data store

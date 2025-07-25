@@ -52,7 +52,7 @@ const MediaCard = ({ media, onToggleWatched, onToggleBackup, onClick }: MediaCar
       <CardContent className="p-0">
         {/* Poster */}
         <div 
-          className="aspect-[3/4] bg-surface rounded-t-lg overflow-hidden cursor-pointer"
+          className="aspect-[2/3] bg-surface rounded-t-lg overflow-hidden cursor-pointer"
           onClick={() => onClick?.(media.id)}
         >
           {media.poster ? (
@@ -76,44 +76,53 @@ const MediaCard = ({ media, onToggleWatched, onToggleBackup, onClick }: MediaCar
           >
             <h3 className="font-semibold text-foreground line-clamp-1 mb-1">{media.title}</h3>
             <span className="text-sm text-muted-foreground">{media.year}</span>
-          </div>
-        
-        <div className="flex flex-wrap gap-2 mb-3">
-          <Badge className={getQualityColor(media.quality)}>
-            {media.quality}
-          </Badge>
+           </div>
+         
+        {/* Genres */}
+        <div className="flex flex-wrap gap-1 mb-2">
           {media.genre.slice(0, 2).map((genre) => (
             <Badge key={genre} variant="outline" className="text-xs">
               {genre}
             </Badge>
           ))}
+        </div>
+        
+        {/* Quality, Media Number, Status */}
+        <div className="flex flex-wrap gap-1 mb-3">
+          <Badge className={getQualityColor(media.quality)}>
+            {media.quality}
+          </Badge>
           {media.mediaNumber && (
             <Badge variant="secondary" className="text-xs">
               #{media.mediaNumber}
             </Badge>
           )}
+          <Badge variant={media.watched ? "default" : "outline"} className="text-xs">
+            {media.watched ? "Seen" : "Unseen"}
+          </Badge>
+          <Badge variant={media.backedUp ? "default" : "outline"} className="text-xs">
+            {media.backedUp ? "Backed" : "Pending"}
+          </Badge>
         </div>
         
-        <div className="flex justify-between items-center">
-          <div className="flex space-x-2">
-            <Button
-              size="sm"
-              variant={media.watched ? "default" : "outline"}
-              onClick={() => onToggleWatched(media.id)}
-              className="h-8 px-2"
-            >
-              {media.watched ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
-            </Button>
-            <Button
-              size="sm"
-              variant={media.backedUp ? "default" : "outline"}
-              onClick={() => onToggleBackup(media.id)}
-              className="h-8 px-2"
-            >
-              <Database className="h-3 w-3" />
-            </Button>
-          </div>
-          </div>
+        <div className="flex space-x-2">
+          <Button
+            size="sm"
+            variant={media.watched ? "default" : "outline"}
+            onClick={() => onToggleWatched(media.id)}
+            className="h-8 px-2 flex-1"
+          >
+            {media.watched ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
+          </Button>
+          <Button
+            size="sm"
+            variant={media.backedUp ? "default" : "outline"}
+            onClick={() => onToggleBackup(media.id)}
+            className="h-8 px-2 flex-1"
+          >
+            <Database className="h-3 w-3" />
+          </Button>
+        </div>
         </div>
       </CardContent>
     </Card>

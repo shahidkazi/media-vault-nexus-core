@@ -168,7 +168,7 @@ const Burn = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground mb-2">Burn Groups</h1>
+        <h1 className="text-3xl font-bold text-foreground mb-2">Burn Recommendations</h1>
         <p className="text-muted-foreground">
           Optimize media groups for backup to maximize {maxSizeGB}GB capacity
         </p>

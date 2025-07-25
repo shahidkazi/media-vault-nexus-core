@@ -104,10 +104,10 @@ const MediaDetails = ({ media, onToggleWatched, onToggleBackup }: MediaDetailsPr
                   <img
                     src={media.poster}
                     alt={media.title}
-                    className="w-full aspect-[2/3] object-cover rounded-lg bg-surface lg:max-w-sm mx-auto"
+                    className="w-full aspect-[2/3] object-cover rounded-lg bg-surface max-w-64 mx-auto"
                   />
                 ) : (
-                  <div className="w-full aspect-[2/3] bg-surface rounded-lg flex items-center justify-center lg:max-w-sm mx-auto">
+                  <div className="w-full aspect-[2/3] bg-surface rounded-lg flex items-center justify-center max-w-64 mx-auto">
                     {getTypeIcon()}
                   </div>
                 )}
@@ -315,16 +315,12 @@ const MediaDetails = ({ media, onToggleWatched, onToggleBackup }: MediaDetailsPr
                                 <span className="font-medium text-sm">{episode.title}</span>
                               </div>
                               <div className="flex flex-wrap gap-1">
-                                {episode.watched && (
-                                  <Badge variant="secondary" className="text-xs">
-                                    Watched
-                                  </Badge>
-                                )}
-                                {episode.backedUp && (
-                                  <Badge variant="secondary" className="text-xs">
-                                    Backed Up
-                                  </Badge>
-                                )}
+                                <Badge variant={episode.watched ? "default" : "outline"} className="text-xs">
+                                  {episode.watched ? "Watched" : "Unwatched"}
+                                </Badge>
+                                <Badge variant={episode.backedUp ? "default" : "outline"} className="text-xs">
+                                  {episode.backedUp ? "Backed Up" : "Pending"}
+                                </Badge>
                               </div>
                             </div>
                             {episode.plot && (

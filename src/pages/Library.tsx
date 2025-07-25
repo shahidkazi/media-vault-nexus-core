@@ -232,6 +232,7 @@ const Library = () => {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
           <Input
+            key="search-input"
             placeholder="Search media..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -310,6 +311,7 @@ const Library = () => {
               <div className="space-y-2 col-span-2">
                 <label className="text-sm font-medium">Media Number</label>
                 <Input
+                  key="media-number-input"
                   placeholder="Filter by media number..."
                   value={mediaNumberFilter}
                   onChange={(e) => setMediaNumberFilter(e.target.value)}
