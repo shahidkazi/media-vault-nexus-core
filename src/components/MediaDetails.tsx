@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ArrowLeft, Film, Tv, Eye, EyeOff, Database, Calendar, Star } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import MediaEditDialog from "./MediaEditDialog";
 
 interface CastMember {
   character: string;
@@ -43,12 +44,14 @@ interface MediaDetailsProps {
     episodes?: Episode[];
     seasons?: number;
     totalEpisodes?: number;
+    imdbId?: string;
   };
   onToggleWatched: (id: string) => void;
   onToggleBackup: (id: string) => void;
+  onUpdateMedia?: (updatedMedia: any) => void;
 }
 
-const MediaDetails = ({ media, onToggleWatched, onToggleBackup }: MediaDetailsProps) => {
+const MediaDetails = ({ media, onToggleWatched, onToggleBackup, onUpdateMedia }: MediaDetailsProps) => {
   const navigate = useNavigate();
 
   const getTypeIcon = () => {
@@ -104,10 +107,10 @@ const MediaDetails = ({ media, onToggleWatched, onToggleBackup }: MediaDetailsPr
                   <img
                     src={media.poster}
                     alt={media.title}
-                    className="w-full aspect-[2/3] object-cover rounded-lg bg-surface max-w-64 mx-auto"
+                    className="w-full aspect-[2/3] object-cover rounded-lg bg-surface max-w-48 mx-auto"
                   />
                 ) : (
-                  <div className="w-full aspect-[2/3] bg-surface rounded-lg flex items-center justify-center max-w-64 mx-auto">
+                  <div className="w-full aspect-[2/3] bg-surface rounded-lg flex items-center justify-center max-w-48 mx-auto">
                     {getTypeIcon()}
                   </div>
                 )}
@@ -139,9 +142,17 @@ const MediaDetails = ({ media, onToggleWatched, onToggleBackup }: MediaDetailsPr
         <div className="lg:col-span-3">
           <Card className="bg-surface-elevated border-border">
             <CardHeader>
-              <div className="flex items-center space-x-2 mb-2">
-                {getTypeIcon()}
-                <CardTitle className="text-2xl">{media.title}</CardTitle>
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center space-x-2">
+                  {getTypeIcon()}
+                  <CardTitle className="text-2xl">{media.title}</CardTitle>
+                </div>
+                {onUpdateMedia && (
+                  <MediaEditDialog 
+                    media={media} 
+                    onSave={onUpdateMedia}
+                  />
+                )}
               </div>
               <div className="space-y-3">
                 <div className="flex flex-wrap gap-2">
@@ -204,6 +215,12 @@ const MediaDetails = ({ media, onToggleWatched, onToggleBackup }: MediaDetailsPr
                     <span>{media.loanedTo}</span>
                   </div>
                 )}
+                <div>
+                  <span className="text-muted-foreground">IMDB: </span>
+                  <a href={`https://www.imdb.com/title/${media.imdbId || ''}`} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                    View on IMDB
+                  </a>
+                </div>
               </div>
 
               {media.description && (
@@ -280,18 +297,14 @@ const MediaDetails = ({ media, onToggleWatched, onToggleBackup }: MediaDetailsPr
                                   <span className="line-clamp-2">{episode.plot}</span>
                                 )}
                               </TableCell>
-                              <TableCell>
-                                <div className="flex flex-col space-y-1">
-                                  {episode.watched && (
-                                    <Badge variant="secondary" className="text-xs w-fit">
-                                      Watched
-                                    </Badge>
-                                  )}
-                                  {episode.backedUp && (
-                                    <Badge variant="secondary" className="text-xs w-fit">
-                                      Backed Up
-                                    </Badge>
-                                  )}
+                               <TableCell>
+                                <div className="flex space-x-1">
+                                  <Badge variant={episode.watched ? "default" : "outline"} className="text-xs">
+                                    <Eye className="h-3 w-3" />
+                                  </Badge>
+                                  <Badge variant={episode.backedUp ? "default" : "outline"} className="text-xs">
+                                    <Database className="h-3 w-3" />
+                                  </Badge>
                                 </div>
                               </TableCell>
                             </TableRow>

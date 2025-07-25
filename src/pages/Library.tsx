@@ -232,7 +232,6 @@ const Library = () => {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
           <Input
-            key="search-input"
             placeholder="Search media..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -311,7 +310,6 @@ const Library = () => {
               <div className="space-y-2 col-span-2">
                 <label className="text-sm font-medium">Media Number</label>
                 <Input
-                  key="media-number-input"
                   placeholder="Filter by media number..."
                   value={mediaNumberFilter}
                   onChange={(e) => setMediaNumberFilter(e.target.value)}
@@ -374,7 +372,7 @@ const Library = () => {
     }
 
     return (
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
         {items.map((item) => (
           <MediaCard
             key={item.id}

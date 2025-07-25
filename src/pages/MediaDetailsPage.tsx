@@ -161,6 +161,14 @@ const MediaDetailsPage = () => {
     );
   };
 
+  const handleUpdateMedia = (updatedMedia: any) => {
+    setMediaItems(items =>
+      items.map(item =>
+        item.id === updatedMedia.id ? { ...item, ...updatedMedia } : item
+      )
+    );
+  };
+
   if (!media) {
     return <NotFound />;
   }
@@ -170,6 +178,7 @@ const MediaDetailsPage = () => {
       media={media}
       onToggleWatched={handleToggleWatched}
       onToggleBackup={handleToggleBackup}
+      onUpdateMedia={handleUpdateMedia}
     />
   );
 };

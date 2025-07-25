@@ -69,26 +69,17 @@ const MediaCard = ({ media, onToggleWatched, onToggleBackup, onClick }: MediaCar
         </div>
 
         {/* Content */}
-        <div className="p-4">
+        <div className="p-3">
           <div 
-            className="mb-3 cursor-pointer" 
+            className="mb-2 cursor-pointer" 
             onClick={() => onClick?.(media.id)}
           >
-            <h3 className="font-semibold text-foreground line-clamp-1 mb-1">{media.title}</h3>
-            <span className="text-sm text-muted-foreground">{media.year}</span>
+            <h3 className="font-semibold text-foreground line-clamp-1 mb-1 text-sm">{media.title}</h3>
+            <span className="text-xs text-muted-foreground">{media.year}</span>
            </div>
-         
-        {/* Genres */}
-        <div className="flex flex-wrap gap-1 mb-2">
-          {media.genre.slice(0, 2).map((genre) => (
-            <Badge key={genre} variant="outline" className="text-xs">
-              {genre}
-            </Badge>
-          ))}
-        </div>
         
         {/* Quality, Media Number, Status */}
-        <div className="flex flex-wrap gap-1 mb-3">
+        <div className="flex flex-wrap gap-1 mb-2">
           <Badge className={getQualityColor(media.quality)}>
             {media.quality}
           </Badge>
@@ -105,12 +96,12 @@ const MediaCard = ({ media, onToggleWatched, onToggleBackup, onClick }: MediaCar
           </Badge>
         </div>
         
-        <div className="flex space-x-2">
+        <div className="flex space-x-1">
           <Button
             size="sm"
             variant={media.watched ? "default" : "outline"}
             onClick={() => onToggleWatched(media.id)}
-            className="h-8 px-2 flex-1"
+            className="h-6 px-1 flex-1"
           >
             {media.watched ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
           </Button>
@@ -118,7 +109,7 @@ const MediaCard = ({ media, onToggleWatched, onToggleBackup, onClick }: MediaCar
             size="sm"
             variant={media.backedUp ? "default" : "outline"}
             onClick={() => onToggleBackup(media.id)}
-            className="h-8 px-2 flex-1"
+            className="h-6 px-1 flex-1"
           >
             <Database className="h-3 w-3" />
           </Button>
