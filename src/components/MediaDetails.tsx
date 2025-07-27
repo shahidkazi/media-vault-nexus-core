@@ -122,7 +122,7 @@ const MediaDetails = ({ media, onToggleWatched, onToggleBackup, onUpdateMedia }:
                     className="flex-1"
                   >
                     {media.watched ? <Eye className="h-4 w-4 mr-2" /> : <EyeOff className="h-4 w-4 mr-2" />}
-                    {media.watched ? "Watched" : "Mark Watched"}
+                    {media.watched ? "Watched" : "Unseen"}
                   </Button>
                   <Button
                     variant={media.backedUp ? "default" : "outline"}
@@ -130,7 +130,7 @@ const MediaDetails = ({ media, onToggleWatched, onToggleBackup, onUpdateMedia }:
                     className="flex-1"
                   >
                     <Database className="h-4 w-4 mr-2" />
-                    {media.backedUp ? "Backed Up" : "Mark Backed Up"}
+                    {media.backedUp ? "Backed Up" : "To Burn"}
                   </Button>
                 </div>
               </div>
@@ -328,11 +328,11 @@ const MediaDetails = ({ media, onToggleWatched, onToggleBackup, onUpdateMedia }:
                                 <span className="font-medium text-sm">{episode.title}</span>
                               </div>
                               <div className="flex flex-wrap gap-1">
-                                <Badge variant={episode.watched ? "default" : "outline"} className="text-xs">
-                                  {episode.watched ? "Watched" : "Unwatched"}
+                                <Badge variant={episode.watched ? "default" : "outline"} className="text-xs px-1">
+                                  {episode.watched ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
                                 </Badge>
-                                <Badge variant={episode.backedUp ? "default" : "outline"} className="text-xs">
-                                  {episode.backedUp ? "Backed Up" : "Pending"}
+                                <Badge variant={episode.backedUp ? "default" : "outline"} className="text-xs px-1">
+                                  <Database className="h-3 w-3" />
                                 </Badge>
                               </div>
                             </div>

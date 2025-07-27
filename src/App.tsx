@@ -22,16 +22,18 @@ const App = () => (
       <BrowserRouter>
         <div className="min-h-screen bg-background">
           <Navigation />
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/library" element={<Library />} />
-            <Route path="/add-media" element={<AddMedia />} />
-            <Route path="/burn" element={<Burn />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="/media/:id" element={<MediaDetailsPage />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+          <main className="pt-16">
+            <Routes>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/library" element={<Library />} />
+              <Route path="/add-media" element={<AddMedia />} />
+              <Route path="/burn" element={<Burn />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/media/:id" element={<MediaDetailsPage />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </main>
         </div>
       </BrowserRouter>
     </TooltipProvider>

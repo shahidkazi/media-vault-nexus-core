@@ -185,11 +185,11 @@ const AddMedia = () => {
               <form onSubmit={handleSubmit} className="space-y-6">
                 <Tabs defaultValue="basic" className="w-full">
                   <TabsList className="grid w-full grid-cols-5 bg-surface border border-border">
-                    <TabsTrigger value="basic">Basic Info</TabsTrigger>
-                    <TabsTrigger value="details">Details</TabsTrigger>
+                    <TabsTrigger value="basic">Basic</TabsTrigger>
+                    <TabsTrigger value="details">Media</TabsTrigger>
                     <TabsTrigger value="cast">Cast</TabsTrigger>
                     <TabsTrigger value="episodes" disabled={formData.type === "movie"}>Episodes</TabsTrigger>
-                    <TabsTrigger value="status">Status</TabsTrigger>
+                    <TabsTrigger value="status">Misc.</TabsTrigger>
                   </TabsList>
 
                   <TabsContent value="basic" className="space-y-4">

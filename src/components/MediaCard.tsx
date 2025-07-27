@@ -88,11 +88,11 @@ const MediaCard = ({ media, onToggleWatched, onToggleBackup, onClick }: MediaCar
               #{media.mediaNumber}
             </Badge>
           )}
-          <Badge variant={media.watched ? "default" : "outline"} className="text-xs">
-            {media.watched ? "Seen" : "Unseen"}
+          <Badge variant={media.watched ? "default" : "outline"} className="text-xs px-1">
+            {media.watched ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
           </Badge>
-          <Badge variant={media.backedUp ? "default" : "outline"} className="text-xs">
-            {media.backedUp ? "Backed" : "Pending"}
+          <Badge variant={media.backedUp ? "default" : "outline"} className="text-xs px-1">
+            <Database className="h-3 w-3" />
           </Badge>
         </div>
         

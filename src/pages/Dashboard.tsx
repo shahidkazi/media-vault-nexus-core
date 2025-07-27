@@ -39,7 +39,6 @@ const Dashboard = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-foreground mb-2">Dashboard</h2>
-          <p className="text-muted-foreground">Overview of your media collection</p>
         </div>
 
         {/* Stats Grid */}
@@ -80,7 +79,7 @@ const Dashboard = () => {
             <CardHeader>
               <CardTitle className="flex items-center space-x-2">
                 <TrendingUp className="h-5 w-5 text-accent" />
-                <span>Media Quality Distribution</span>
+                <span>Quality Distribution</span>
               </CardTitle>
             </CardHeader>
             <CardContent>
