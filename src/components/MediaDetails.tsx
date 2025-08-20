@@ -45,13 +45,16 @@ interface MediaDetailsProps {
     seasons?: number;
     totalEpisodes?: number;
     imdbId?: string;
+    language?: string;
+    userRating?: number;
   };
+  allMediaItems?: any[];
   onToggleWatched: (id: string) => void;
   onToggleBackup: (id: string) => void;
   onUpdateMedia?: (updatedMedia: any) => void;
 }
 
-const MediaDetails = ({ media, onToggleWatched, onToggleBackup, onUpdateMedia }: MediaDetailsProps) => {
+const MediaDetails = ({ media, allMediaItems, onToggleWatched, onToggleBackup, onUpdateMedia }: MediaDetailsProps) => {
   const navigate = useNavigate();
 
   const getTypeIcon = () => {
@@ -84,25 +87,42 @@ const MediaDetails = ({ media, onToggleWatched, onToggleBackup, onUpdateMedia }:
     return acc;
   }, {} as Record<number, Episode[]>);
 
+  // Get related media items with the same media number
+  const relatedMedia = allMediaItems?.filter(item => 
+    item.mediaNumber === media.mediaNumber && item.id !== media.id
+  ) || [];
+
+  const handleRelatedMediaClick = (mediaId: string) => {
+    navigate(`/media/${mediaId}`);
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="mb-6">
-        <Button
-          variant="ghost"
-          onClick={() => navigate(-1)}
-          className="mb-4"
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Library
-        </Button>
+        <div className="flex items-center justify-between mb-6">
+          <Button
+            variant="ghost"
+            onClick={() => navigate(-1)}
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Library
+          </Button>
+          
+          {onUpdateMedia && (
+            <MediaEditDialog 
+              media={media} 
+              onSave={onUpdateMedia}
+            />
+          )}
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-1 lg:flex lg:gap-6 gap-6">
         {/* Poster and Quick Actions */}
-        <div className="lg:col-span-2">
-          <Card className="bg-surface-elevated border-border">
-            <CardContent className="p-6">
-              <div className="space-y-4">
+        <div className="lg:flex-shrink-0 lg:max-w-xs">
+          <Card className="bg-surface-elevated border-border lg:h-full">
+            <CardContent className="p-6 lg:h-full lg:flex lg:flex-col lg:justify-between">
+              <div className="lg:flex-1 lg:flex lg:items-center lg:justify-center">
                 {media.poster ? (
                   <img
                     src={media.poster}
@@ -114,47 +134,56 @@ const MediaDetails = ({ media, onToggleWatched, onToggleBackup, onUpdateMedia }:
                     {getTypeIcon()}
                   </div>
                 )}
-                
-                <div className="flex justify-center space-x-2">
-                  <Button
-                    variant={media.watched ? "default" : "outline"}
-                    onClick={() => onToggleWatched(media.id)}
-                    className="flex-1"
-                  >
-                    {media.watched ? <Eye className="h-4 w-4 mr-2" /> : <EyeOff className="h-4 w-4 mr-2" />}
-                    {media.watched ? "Watched" : "Unseen"}
-                  </Button>
-                  <Button
-                    variant={media.backedUp ? "default" : "outline"}
-                    onClick={() => onToggleBackup(media.id)}
-                    className="flex-1"
-                  >
-                    <Database className="h-4 w-4 mr-2" />
-                    {media.backedUp ? "Backed Up" : "To Burn"}
-                  </Button>
-                </div>
+              </div>
+              
+              <div className="flex space-x-2 justify-center mt-4">
+                <Button
+                  variant={media.watched ? "default" : "outline"}
+                  onClick={() => onToggleWatched(media.id)}
+                  size="sm"
+                  className="px-3"
+                >
+                  {media.watched ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                </Button>
+                <Button
+                  variant={media.backedUp ? "default" : "outline"}
+                  onClick={() => onToggleBackup(media.id)}
+                  size="sm"
+                  className="px-3"
+                >
+                  <Database className="h-4 w-4" />
+                </Button>
               </div>
             </CardContent>
           </Card>
         </div>
 
         {/* Main Details */}
-        <div className="lg:col-span-3">
-          <Card className="bg-surface-elevated border-border">
+        <div className="lg:flex-1">
+          <Card className="bg-surface-elevated border-border h-fit lg:h-full">
             <CardHeader>
-              <div className="flex items-center justify-between mb-2">
+              <div className="space-y-3">
                 <div className="flex items-center space-x-2">
                   {getTypeIcon()}
                   <CardTitle className="text-2xl">{media.title}</CardTitle>
+                  {/* Desktop badges next to title */}
+                  <div className="hidden lg:flex lg:items-center lg:gap-2 lg:ml-4">
+                    <Badge className={getQualityColor(media.quality)}>
+                      {media.quality}
+                    </Badge>
+                    {media.mediaNumber && (
+                      <Badge variant="secondary">
+                        #{media.mediaNumber}
+                      </Badge>
+                    )}
+                    {media.pendingBackup && (
+                      <Badge variant="destructive">
+                        Pending Backup
+                      </Badge>
+                    )}
+                  </div>
                 </div>
-                {onUpdateMedia && (
-                  <MediaEditDialog 
-                    media={media} 
-                    onSave={onUpdateMedia}
-                  />
-                )}
-              </div>
-              <div className="space-y-3">
+                
                 <div className="flex flex-wrap gap-2">
                   {media.genre.map((genre) => (
                     <Badge key={genre} variant="outline">
@@ -162,7 +191,8 @@ const MediaDetails = ({ media, onToggleWatched, onToggleBackup, onUpdateMedia }:
                     </Badge>
                   ))}
                 </div>
-                <div className="flex flex-wrap gap-2">
+                {/* Mobile badges below genres */}
+                <div className="flex flex-wrap gap-2 lg:hidden">
                   <Badge className={getQualityColor(media.quality)}>
                     {media.quality}
                   </Badge>
@@ -185,10 +215,22 @@ const MediaDetails = ({ media, onToggleWatched, onToggleBackup, onUpdateMedia }:
                   <Calendar className="h-4 w-4 text-muted-foreground" />
                   <span>{media.year}</span>
                 </div>
+                {media.language && (
+                  <div>
+                    <span className="text-muted-foreground">Language: </span>
+                    <span>{media.language}</span>
+                  </div>
+                )}
                 {media.onlineRating && (
                   <div className="flex items-center space-x-2">
                     <Star className="h-4 w-4 text-muted-foreground" />
-                    <span>{media.onlineRating}</span>
+                    <span>IMDB: {media.onlineRating}</span>
+                  </div>
+                )}
+                {media.userRating && (
+                  <div className="flex items-center space-x-2">
+                    <Star className="h-4 w-4 text-yellow-500" />
+                    <span>My Rating: {media.userRating}/10</span>
                   </div>
                 )}
                 {media.director && (
@@ -320,33 +362,81 @@ const MediaDetails = ({ media, onToggleWatched, onToggleBackup, onUpdateMedia }:
                       .map((episode, index) => (
                         <Card key={index} className="bg-surface border-border">
                           <CardContent className="p-4">
-                            <div className="flex items-start justify-between mb-2">
-                              <div className="flex items-center space-x-2">
-                                <Badge variant="outline" className="text-xs">
-                                  E{episode.episode}
-                                </Badge>
-                                <span className="font-medium text-sm">{episode.title}</span>
-                              </div>
-                              <div className="flex flex-wrap gap-1">
-                                <Badge variant={episode.watched ? "default" : "outline"} className="text-xs px-1">
-                                  {episode.watched ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
-                                </Badge>
-                                <Badge variant={episode.backedUp ? "default" : "outline"} className="text-xs px-1">
-                                  <Database className="h-3 w-3" />
-                                </Badge>
-                              </div>
+                            <div className="flex items-center space-x-2 mb-2">
+                              <Badge variant="outline" className="text-xs">
+                                E{episode.episode}
+                              </Badge>
+                              <span className="font-medium text-sm">{episode.title}</span>
                             </div>
                             {episode.plot && (
-                              <p className="text-sm text-muted-foreground line-clamp-3">
+                              <p className="text-sm text-muted-foreground line-clamp-3 mb-3">
                                 {episode.plot}
                               </p>
                             )}
+                            <div className="flex gap-1">
+                              <Badge variant={episode.watched ? "default" : "outline"} className="text-xs px-1">
+                                {episode.watched ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
+                              </Badge>
+                              <Badge variant={episode.backedUp ? "default" : "outline"} className="text-xs px-1">
+                                <Database className="h-3 w-3" />
+                              </Badge>
+                            </div>
                           </CardContent>
                         </Card>
                       ))}
                   </div>
                 </div>
               ))}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Related Media */}
+      {relatedMedia.length > 0 && (
+        <Card className="mt-6 bg-surface-elevated border-border">
+          <CardHeader>
+            <CardTitle>Related Media (#{media.mediaNumber})</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {relatedMedia.map((item) => (
+                <Card
+                  key={item.id}
+                  className="bg-surface border-border cursor-pointer hover:bg-surface-hover transition-colors"
+                  onClick={() => handleRelatedMediaClick(item.id)}
+                >
+                  <CardContent className="p-4">
+                    <div className="flex items-center space-x-3">
+                      {item.poster ? (
+                        <img
+                          src={item.poster}
+                          alt={item.title}
+                          className="w-16 h-24 object-cover rounded-md flex-shrink-0"
+                        />
+                      ) : (
+                        <div className="w-16 h-24 bg-surface rounded-md flex items-center justify-center text-muted-foreground flex-shrink-0">
+                          {item.type === "movie" ? <Film className="h-5 w-5" /> : <Tv className="h-5 w-5" />}
+                        </div>
+                      )}
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-semibold text-sm truncate">{item.title}</h4>
+                        <p className="text-xs text-muted-foreground">
+                          {item.year} • {item.quality}
+                        </p>
+                        <div className="flex space-x-1 mt-1">
+                          <Badge variant={item.watched ? "default" : "outline"} className="text-xs px-1">
+                            {item.watched ? <Eye className="h-2 w-2" /> : <EyeOff className="h-2 w-2" />}
+                          </Badge>
+                          <Badge variant={item.backedUp ? "default" : "outline"} className="text-xs px-1">
+                            <Database className="h-2 w-2" />
+                          </Badge>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </CardContent>
         </Card>
       )}

@@ -7,10 +7,11 @@ import { Badge } from "@/components/ui/badge";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Card, CardContent } from "@/components/ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import MediaCard from "@/components/MediaCard";
 import MediaDetails from "@/components/MediaDetails";
 import { useNavigate } from "react-router-dom";
-import { Search, Filter, SortAsc, ChevronDown } from "lucide-react";
+import { Search, Filter, SortAsc, ChevronDown, Grid3X3, List, Eye, EyeOff, Database } from "lucide-react";
 
 interface FilterControlsProps {
   searchTerm: string;
@@ -203,6 +204,9 @@ const Library = () => {
   const [mediaNumberFilter, setMediaNumberFilter] = useState("");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<"grid" | "table">(
+    () => (localStorage.getItem("defaultView") as "grid" | "table") || "grid"
+  );
   const navigate = useNavigate();
 
   // Sample data
@@ -221,7 +225,9 @@ const Library = () => {
       rating: 9.0,
       fileSize: "8.5 GB",
       director: "Christopher Nolan",
+      language: "English",
       onlineRating: "9.0/10",
+      userRating: 9.5,
       description: "When the menace known as the Joker wreaks havoc and chaos on the people of Gotham, Batman must accept one of the greatest psychological and physical tests of his ability to fight injustice.",
       cast: [
         { character: "Batman/Bruce Wayne", actor: "Christian Bale" },
@@ -244,7 +250,9 @@ const Library = () => {
       rating: 8.8,
       fileSize: "4.2 GB",
       director: "Christopher Nolan",
+      language: "English",
       onlineRating: "8.8/10",
+      userRating: 8.0,
       description: "A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.",
       cast: [
         { character: "Dom Cobb", actor: "Leonardo DiCaprio" },
@@ -268,7 +276,9 @@ const Library = () => {
       seasons: 5,
       totalEpisodes: 62,
       director: "Vince Gilligan",
+      language: "English",
       onlineRating: "9.5/10",
+      userRating: 10.0,
       description: "A high school chemistry teacher diagnosed with inoperable lung cancer turns to manufacturing and selling methamphetamine in order to secure his family's future.",
       cast: [
         { character: "Walter White", actor: "Bryan Cranston" },
@@ -297,7 +307,9 @@ const Library = () => {
       fileSize: "12.4 GB",
       totalEpisodes: 5,
       director: "Craig Mazin",
+      language: "English/Russian",
       onlineRating: "9.3/10",
+      userRating: 9.0,
       description: "The true story of one of the worst man-made catastrophes in history: the catastrophic nuclear accident at Chernobyl.",
       cast: [
         { character: "Valery Legasov", actor: "Jared Harris" },
@@ -327,7 +339,9 @@ const Library = () => {
       seasons: 4,
       totalEpisodes: 34,
       director: "The Duffer Brothers",
+      language: "English",
       onlineRating: "8.7/10",
+      userRating: 9.0,
       description: "When a young boy disappears, his mother, a police chief and his friends must confront terrifying supernatural forces in order to get him back.",
       cast: [
         { character: "Eleven", actor: "Millie Bobby Brown" },
@@ -340,22 +354,6 @@ const Library = () => {
       ]
     }
   ]);
-
-  const handleToggleWatched = (id: string) => {
-    setMediaItems(items =>
-      items.map(item =>
-        item.id === id ? { ...item, watched: !item.watched } : item
-      )
-    );
-  };
-
-  const handleToggleBackup = (id: string) => {
-    setMediaItems(items =>
-      items.map(item =>
-        item.id === id ? { ...item, backedUp: !item.backedUp } : item
-      )
-    );
-  };
 
   const handleMediaClick = (mediaId: string) => {
     navigate(`/media/${mediaId}`);
@@ -417,14 +415,129 @@ const Library = () => {
       );
     }
 
+    if (viewMode === "table") {
+      return (
+        <Card className="bg-surface-elevated border-border">
+          <CardContent className="p-0">
+            {/* Desktop table view */}
+            <div className="hidden md:block">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="w-12"></TableHead>
+                    <TableHead>Title</TableHead>
+                    <TableHead>Year</TableHead>
+                    <TableHead>Quality</TableHead>
+                    <TableHead>Language</TableHead>
+                    <TableHead>Genre</TableHead>
+                    <TableHead>Media #</TableHead>
+                    <TableHead>IMDB</TableHead>
+                    <TableHead>My Rating</TableHead>
+                    <TableHead className="w-20">Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {items.map((item) => (
+                    <TableRow 
+                      key={item.id} 
+                      className="cursor-pointer hover:bg-surface-hover"
+                      onClick={() => handleMediaClick(item.id)}
+                    >
+                      <TableCell>
+                        {item.type === "movie" ? (
+                          <div className="w-8 h-8 bg-primary/20 rounded flex items-center justify-center">
+                            <span className="text-xs font-bold text-primary">M</span>
+                          </div>
+                        ) : (
+                          <div className="w-8 h-8 bg-accent/20 rounded flex items-center justify-center">
+                            <span className="text-xs font-bold text-accent">TV</span>
+                          </div>
+                        )}
+                      </TableCell>
+                      <TableCell className="font-medium">{item.title}</TableCell>
+                      <TableCell>{item.year}</TableCell>
+                      <TableCell>
+                        <Badge 
+                          className={item.quality === "4K" ? "bg-primary text-primary-foreground" : 
+                                    item.quality === "1080p" ? "bg-accent text-accent-foreground" : 
+                                    "bg-secondary text-secondary-foreground"}
+                        >
+                          {item.quality}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>{item.language || "-"}</TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap gap-1">
+                          {item.genre.slice(0, 2).map((genre: string) => (
+                            <Badge key={genre} variant="outline" className="text-xs">
+                              {genre}
+                            </Badge>
+                          ))}
+                          {item.genre.length > 2 && (
+                            <span className="text-xs text-muted-foreground">+{item.genre.length - 2}</span>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {item.mediaNumber && (
+                          <Badge variant="secondary" className="text-xs">
+                            #{item.mediaNumber}
+                          </Badge>
+                        )}
+                      </TableCell>
+                      <TableCell>{item.onlineRating || "-"}</TableCell>
+                      <TableCell>{item.userRating ? `${item.userRating}/10` : "-"}</TableCell>
+                      <TableCell>
+                        <div className="flex space-x-1">
+                          <Badge variant={item.watched ? "default" : "outline"} className="text-xs px-1">
+                            {item.watched ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
+                          </Badge>
+                          <Badge variant={item.backedUp ? "default" : "outline"} className="text-xs px-1">
+                            <Database className="h-3 w-3" />
+                          </Badge>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+
+            {/* Mobile simplified table view - only title and year */}
+            <div className="md:hidden">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Title</TableHead>
+                    <TableHead>Year</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {items.map((item) => (
+                    <TableRow 
+                      key={item.id} 
+                      className="cursor-pointer hover:bg-surface-hover"
+                      onClick={() => handleMediaClick(item.id)}
+                    >
+                      <TableCell className="font-medium">{item.title}</TableCell>
+                      <TableCell>{item.year}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+      );
+    }
+
+    // Grid view (default)
     return (
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
         {items.map((item) => (
           <MediaCard
             key={item.id}
             media={item}
-            onToggleWatched={handleToggleWatched}
-            onToggleBackup={handleToggleBackup}
             onClick={handleMediaClick}
           />
         ))}
@@ -483,6 +596,26 @@ const Library = () => {
                 sortOrder={sortOrder}
                 setSortOrder={setSortOrder}
               />
+              
+              {/* View Toggle */}
+              <div className="flex border border-border rounded-md bg-surface">
+                <Button
+                  variant={viewMode === "grid" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("grid")}
+                  className="rounded-r-none border-r border-border"
+                >
+                  <Grid3X3 className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant={viewMode === "table" ? "default" : "ghost"}
+                  size="sm"
+                  onClick={() => setViewMode("table")}
+                  className="rounded-l-none"
+                >
+                  <List className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
           </div>
         </div>

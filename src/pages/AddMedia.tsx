@@ -45,7 +45,9 @@ const AddMedia = () => {
     fileSize: "",
     edition: "",
     director: "",
+    language: "",
     onlineRating: "",
+    userRating: "",
     description: "",
     watched: false,
     backedUp: false,
@@ -124,7 +126,9 @@ const AddMedia = () => {
       fileSize: "",
       edition: "",
       director: "",
+      language: "",
       onlineRating: "",
+      userRating: "",
       description: "",
       watched: false,
       backedUp: false,
@@ -240,12 +244,39 @@ const AddMedia = () => {
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="onlineRating">Online Rating</Label>
+                        <Label htmlFor="language">Language</Label>
+                        <Input
+                          id="language"
+                          placeholder="e.g., English, Spanish"
+                          value={formData.language}
+                          onChange={(e) => handleInputChange("language", e.target.value)}
+                          className="bg-surface border-border"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="onlineRating">IMDB/TMDB Rating</Label>
                         <Input
                           id="onlineRating"
                           placeholder="e.g., 8.5/10"
                           value={formData.onlineRating}
                           onChange={(e) => handleInputChange("onlineRating", e.target.value)}
+                          className="bg-surface border-border"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="userRating">My Rating</Label>
+                        <Input
+                          id="userRating"
+                          type="number"
+                          min="0"
+                          max="10"
+                          step="0.1"
+                          placeholder="0-10"
+                          value={formData.userRating}
+                          onChange={(e) => handleInputChange("userRating", e.target.value)}
                           className="bg-surface border-border"
                         />
                       </div>

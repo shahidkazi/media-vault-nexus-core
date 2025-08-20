@@ -3,13 +3,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Download, Upload, Database, Settings as SettingsIcon, FileJson, FileSpreadsheet } from "lucide-react";
+import { Download, Upload, Database, Settings as SettingsIcon, FileJson, FileSpreadsheet, Grid3X3, List } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const Settings = () => {
   const { toast } = useToast();
   const [importFile, setImportFile] = useState<File | null>(null);
+  const [defaultView, setDefaultView] = useState<"grid" | "table">(
+    () => (localStorage.getItem("defaultView") as "grid" | "table") || "grid"
+  );
 
   const handleExport = (format: 'json' | 'csv' | 'xlsx') => {
     // Mock export - would generate actual file
@@ -49,6 +53,18 @@ const Settings = () => {
       title: "Database Restored",
       description: "Collection has been restored from backup",
     });
+  };
+
+  const handleSaveSettings = () => {
+    localStorage.setItem("defaultView", defaultView);
+    toast({
+      title: "Settings Saved",
+      description: "Your preferences have been saved successfully",
+    });
+  };
+
+  const handleDefaultViewChange = (value: "grid" | "table") => {
+    setDefaultView(value);
   };
 
   return (
@@ -201,6 +217,32 @@ const Settings = () => {
                 </div>
 
                 <div className="space-y-2">
+                  <Label htmlFor="default-view">Default Library View</Label>
+                  <Select value={defaultView} onValueChange={handleDefaultViewChange}>
+                    <SelectTrigger className="bg-surface border-border">
+                      <SelectValue placeholder="Select default view" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="grid">
+                        <div className="flex items-center space-x-2">
+                          <Grid3X3 className="h-4 w-4" />
+                          <span>Grid View</span>
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="table">
+                        <div className="flex items-center space-x-2">
+                          <List className="h-4 w-4" />
+                          <span>Table View</span>
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-xs text-muted-foreground">
+                    Choose your preferred default view for the library page
+                  </p>
+                </div>
+
+                <div className="space-y-2">
                   <Label htmlFor="tmdb-api">TMDB API Key</Label>
                   <Input
                     id="tmdb-api"
@@ -214,7 +256,7 @@ const Settings = () => {
                 </div>
               </div>
               
-              <Button className="w-full bg-primary hover:bg-primary/90">
+              <Button onClick={handleSaveSettings} className="w-full bg-primary hover:bg-primary/90">
                 Save Settings
               </Button>
             </CardContent>

@@ -18,12 +18,10 @@ interface MediaItem {
 
 interface MediaCardProps {
   media: MediaItem;
-  onToggleWatched: (id: string) => void;
-  onToggleBackup: (id: string) => void;
   onClick?: (id: string) => void;
 }
 
-const MediaCard = ({ media, onToggleWatched, onToggleBackup, onClick }: MediaCardProps) => {
+const MediaCard = ({ media, onClick }: MediaCardProps) => {
   const getTypeIcon = () => {
     switch (media.type) {
       case "movie":
@@ -94,25 +92,6 @@ const MediaCard = ({ media, onToggleWatched, onToggleBackup, onClick }: MediaCar
           <Badge variant={media.backedUp ? "default" : "outline"} className="text-xs px-1">
             <Database className="h-3 w-3" />
           </Badge>
-        </div>
-        
-        <div className="flex space-x-1">
-          <Button
-            size="sm"
-            variant={media.watched ? "default" : "outline"}
-            onClick={() => onToggleWatched(media.id)}
-            className="h-6 px-1 flex-1"
-          >
-            {media.watched ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
-          </Button>
-          <Button
-            size="sm"
-            variant={media.backedUp ? "default" : "outline"}
-            onClick={() => onToggleBackup(media.id)}
-            className="h-6 px-1 flex-1"
-          >
-            <Database className="h-3 w-3" />
-          </Button>
         </div>
         </div>
       </CardContent>
