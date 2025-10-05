@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,9 +11,14 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, Plus, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 const AddMedia = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [genres, setGenres] = useState<string[]>([]);
   const [newGenre, setNewGenre] = useState("");
@@ -108,37 +114,119 @@ const AddMedia = () => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Mock save - would save to your data store
-    toast({
-      title: "Media Added",
-      description: `${formData.title} has been added to your collection`,
-    });
     
-    // Reset form
-    setFormData({
-      title: "",
-      type: "",
-      year: "",
-      quality: "",
-      mediaNumber: "",
-      fileSize: "",
-      edition: "",
-      director: "",
-      language: "",
-      onlineRating: "",
-      userRating: "",
-      description: "",
-      watched: false,
-      backedUp: false,
-      pendingBackup: false,
-      loaned: false,
-      loanedTo: ""
-    });
-    setGenres([]);
-    setCast([]);
-    setEpisodes([]);
+    if (!user) {
+      toast({
+        title: "Error",
+        description: "You must be logged in to add media",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!formData.title || !formData.type) {
+      toast({
+        title: "Error",
+        description: "Please fill in all required fields (Title and Type)",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      // Map form type to database type
+      const typeMap: Record<string, string> = {
+        "movie": "Movie",
+        "tv-series": "TV Series",
+        "mini-series": "Mini Series"
+      };
+
+      // Insert media
+      const { data: mediaData, error: mediaError } = await supabase
+        .from('media')
+        .insert({
+          user_id: user.id,
+          title: formData.title,
+          type: typeMap[formData.type] || formData.type,
+          genres: genres,
+          quality: formData.quality || null,
+          media_number: formData.mediaNumber || null,
+          seen: formData.watched,
+          backed_up: formData.backedUp,
+          poster_url: null,
+          imdb_url: null,
+          tmdb_url: null,
+          edition: formData.edition || null,
+        })
+        .select()
+        .single();
+
+      if (mediaError) throw mediaError;
+
+      // Insert episodes if this is a TV series or mini series
+      if (episodes.length > 0 && mediaData) {
+        const episodesData = episodes.map(ep => ({
+          media_id: mediaData.id,
+          season: ep.season,
+          episode: ep.episode,
+          title: ep.title,
+          seen: ep.watched,
+          backed_up: ep.backedUp,
+        }));
+
+        const { error: episodesError } = await supabase
+          .from('episodes')
+          .insert(episodesData);
+
+        if (episodesError) throw episodesError;
+      }
+
+      toast({
+        title: "Success!",
+        description: `${formData.title} has been added to your collection`,
+      });
+
+      // Reset form
+      setFormData({
+        title: "",
+        type: "",
+        year: "",
+        quality: "",
+        mediaNumber: "",
+        fileSize: "",
+        edition: "",
+        director: "",
+        language: "",
+        onlineRating: "",
+        userRating: "",
+        description: "",
+        watched: false,
+        backedUp: false,
+        pendingBackup: false,
+        loaned: false,
+        loanedTo: ""
+      });
+      setGenres([]);
+      setCast([]);
+      setEpisodes([]);
+
+      // Navigate to library
+      setTimeout(() => navigate('/library'), 1000);
+
+    } catch (error: any) {
+      console.error('Error adding media:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to add media. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
