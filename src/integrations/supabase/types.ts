@@ -14,7 +14,104 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      episodes: {
+        Row: {
+          backed_up: boolean | null
+          created_at: string | null
+          episode: number
+          id: string
+          media_id: string
+          season: number
+          seen: boolean | null
+          title: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          backed_up?: boolean | null
+          created_at?: string | null
+          episode: number
+          id?: string
+          media_id: string
+          season: number
+          seen?: boolean | null
+          title?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          backed_up?: boolean | null
+          created_at?: string | null
+          episode?: number
+          id?: string
+          media_id?: string
+          season?: number
+          seen?: boolean | null
+          title?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "episodes_media_id_fkey"
+            columns: ["media_id"]
+            isOneToOne: false
+            referencedRelation: "media"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      media: {
+        Row: {
+          backed_up: boolean | null
+          created_at: string | null
+          edition: string | null
+          genres: string[] | null
+          id: string
+          imdb_url: string | null
+          media_number: string | null
+          poster_url: string | null
+          quality: string | null
+          seen: boolean | null
+          title: string
+          tmdb_url: string | null
+          type: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          backed_up?: boolean | null
+          created_at?: string | null
+          edition?: string | null
+          genres?: string[] | null
+          id?: string
+          imdb_url?: string | null
+          media_number?: string | null
+          poster_url?: string | null
+          quality?: string | null
+          seen?: boolean | null
+          title: string
+          tmdb_url?: string | null
+          type: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          backed_up?: boolean | null
+          created_at?: string | null
+          edition?: string | null
+          genres?: string[] | null
+          id?: string
+          imdb_url?: string | null
+          media_number?: string | null
+          poster_url?: string | null
+          quality?: string | null
+          seen?: boolean | null
+          title?: string
+          tmdb_url?: string | null
+          type?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
