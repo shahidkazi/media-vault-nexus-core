@@ -67,9 +67,8 @@ const MediaDetailsPage = () => {
         poster: mediaData.poster_url || "/placeholder.svg",
         cast: mediaData.cast_members || [],
         edition: mediaData.edition,
-        imdbUrl: mediaData.imdb_url,
-        tmdbUrl: mediaData.tmdb_url,
-        year: new Date().getFullYear(), // You may want to add a year column
+        imdbId: mediaData.imdb_url?.split('/title/')[1]?.replace('/', '') || undefined,
+        year: new Date().getFullYear(),
         episodes: episodesData?.map(ep => ({
           season: ep.season,
           episode: ep.episode,
