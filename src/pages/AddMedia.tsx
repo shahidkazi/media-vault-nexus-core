@@ -153,6 +153,7 @@ const AddMedia = () => {
           title: formData.title,
           type: typeMap[formData.type] || formData.type,
           genres: genres,
+          cast_members: cast,
           quality: formData.quality || null,
           media_number: formData.mediaNumber || null,
           seen: formData.watched,

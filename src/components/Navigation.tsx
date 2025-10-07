@@ -15,7 +15,7 @@ const Navigation = () => {
   const navItems = [
     { to: "/", icon: BarChart3, label: "Dashboard" },
     { to: "/library", icon: Film, label: "Library" },
-    { to: "/add-media", icon: Plus, label: "Add New" },
+    { to: "/add-media", icon: Plus, label: "New" },
     { to: "/burn", icon: Disc, label: "Burn" },
     { to: "/settings", icon: Settings, label: "Settings" },
   ];

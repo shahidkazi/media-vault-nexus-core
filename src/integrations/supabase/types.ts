@@ -61,6 +61,7 @@ export type Database = {
       media: {
         Row: {
           backed_up: boolean | null
+          cast_members: Json | null
           created_at: string | null
           edition: string | null
           genres: string[] | null
@@ -78,6 +79,7 @@ export type Database = {
         }
         Insert: {
           backed_up?: boolean | null
+          cast_members?: Json | null
           created_at?: string | null
           edition?: string | null
           genres?: string[] | null
@@ -95,6 +97,7 @@ export type Database = {
         }
         Update: {
           backed_up?: boolean | null
+          cast_members?: Json | null
           created_at?: string | null
           edition?: string | null
           genres?: string[] | null
