@@ -2,239 +2,233 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import MediaDetails from "@/components/MediaDetails";
 import NotFound from "./NotFound";
-
-// Mock data - in a real app this would come from your data store
-const mockMediaData = [
-  {
-    id: "1",
-    title: "The Dark Knight",
-    type: "movie" as const,
-    year: 2008,
-    genre: ["Action", "Drama"],
-    quality: "4K",
-    watched: true,
-    backedUp: true,
-    mediaNumber: "M001",
-    poster: "/placeholder.svg",
-    rating: 9.0,
-    fileSize: "8.5 GB",
-    director: "Christopher Nolan",
-    language: "English",
-    onlineRating: "9.0/10",
-    userRating: 9.5,
-    description: "When the menace known as the Joker wreaks havoc and chaos on the people of Gotham, Batman must accept one of the greatest psychological and physical tests of his ability to fight injustice.",
-    cast: [
-      { character: "Batman/Bruce Wayne", actor: "Christian Bale" },
-      { character: "Joker", actor: "Heath Ledger" },
-      { character: "Harvey Dent", actor: "Aaron Eckhart" }
-    ]
-  },
-  {
-    id: "2", 
-    title: "Inception",
-    type: "movie" as const,
-    year: 2010,
-    genre: ["Sci-Fi", "Action"],
-    quality: "1080p",
-    watched: false,
-    backedUp: false,
-    pendingBackup: true,
-    mediaNumber: "M002",
-    poster: "/placeholder.svg",
-    rating: 8.8,
-    fileSize: "4.2 GB",
-    director: "Christopher Nolan",
-    language: "English",
-    onlineRating: "8.8/10",
-    userRating: 8.0,
-    description: "A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a C.E.O.",
-    cast: [
-      { character: "Dom Cobb", actor: "Leonardo DiCaprio" },
-      { character: "Arthur", actor: "Tom Hardy" },
-      { character: "Ariadne", actor: "Elliot Page" }
-    ]
-  },
-  {
-    id: "3",
-    title: "Breaking Bad",
-    type: "tv-series" as const,
-    year: 2008,
-    genre: ["Drama", "Crime"],
-    quality: "1080p", 
-    watched: true,
-    backedUp: true,
-    mediaNumber: "TV001",
-    poster: "/placeholder.svg",
-    rating: 9.5,
-    fileSize: "45.8 GB",
-    seasons: 5,
-    totalEpisodes: 62,
-    director: "Vince Gilligan",
-    language: "English",
-    onlineRating: "9.5/10",
-    userRating: 10.0,
-    description: "A high school chemistry teacher diagnosed with inoperable lung cancer turns to manufacturing and selling methamphetamine in order to secure his family's future.",
-    cast: [
-      { character: "Walter White", actor: "Bryan Cranston" },
-      { character: "Jesse Pinkman", actor: "Aaron Paul" },
-      { character: "Skyler White", actor: "Anna Gunn" }
-    ],
-    episodes: [
-      { season: 1, episode: 1, title: "Pilot", plot: "Walter White begins cooking meth", watched: true, backedUp: true },
-      { season: 1, episode: 2, title: "Cat's in the Bag...", plot: "Walter and Jesse dispose of bodies", watched: true, backedUp: true },
-      { season: 1, episode: 3, title: "...And the Bag's in the River", plot: "Walter confronts his first kill", watched: true, backedUp: false }
-    ]
-  },
-  {
-    id: "4",
-    title: "Chernobyl",
-    type: "mini-series" as const,
-    year: 2019,
-    genre: ["Drama", "History"],
-    quality: "4K",
-    watched: false,
-    backedUp: false,
-    pendingBackup: true,
-    mediaNumber: "MS001", 
-    poster: "/placeholder.svg",
-    rating: 9.3,
-    fileSize: "12.4 GB",
-    totalEpisodes: 5,
-    director: "Craig Mazin",
-    language: "English/Russian",
-    onlineRating: "9.3/10",
-    userRating: 9.0,
-    description: "The true story of one of the worst man-made catastrophes in history: the catastrophic nuclear accident at Chernobyl.",
-    cast: [
-      { character: "Valery Legasov", actor: "Jared Harris" },
-      { character: "Boris Shcherbina", actor: "Stellan Skarsgård" },
-      { character: "Ulana Khomyuk", actor: "Emily Watson" }
-    ],
-    episodes: [
-      { season: 1, episode: 1, title: "1:23:45", plot: "The nuclear accident occurs", watched: false, backedUp: false },
-      { season: 1, episode: 2, title: "Please Remain Calm", plot: "The Soviet response begins", watched: false, backedUp: false },
-      { season: 1, episode: 3, title: "Open Wide, O Earth", plot: "The cleanup effort intensifies", watched: false, backedUp: false }
-    ]
-  },
-  {
-    id: "5",
-    title: "Stranger Things",
-    type: "tv-series" as const,
-    year: 2016,
-    genre: ["Sci-Fi", "Horror"],
-    quality: "4K",
-    watched: true,
-    backedUp: false,
-    pendingBackup: true,
-    mediaNumber: "TV002",
-    poster: "/placeholder.svg", 
-    rating: 8.7,
-    fileSize: "78.2 GB",
-    seasons: 4,
-    totalEpisodes: 34,
-    director: "The Duffer Brothers",
-    language: "English",
-    onlineRating: "8.7/10",
-    userRating: 8.5,
-    description: "When a young boy disappears, his mother, a police chief and his friends must confront terrifying supernatural forces in order to get him back.",
-    cast: [
-      { character: "Eleven", actor: "Millie Bobby Brown" },
-      { character: "Mike Wheeler", actor: "Finn Wolfhard" },
-      { character: "Jim Hopper", actor: "David Harbour" }
-    ],
-    episodes: [
-      { season: 1, episode: 1, title: "Chapter One: The Vanishing of Will Byers", plot: "Will Byers disappears", watched: true, backedUp: false },
-      { season: 1, episode: 2, title: "Chapter Two: The Weirdo on Maple Street", plot: "The boys meet Eleven", watched: true, backedUp: false }
-    ]
-  },
-  {
-    id: "6",
-    title: "The Dark Knight Rises",
-    type: "movie" as const,
-    year: 2012,
-    genre: ["Action", "Drama"],
-    quality: "4K",
-    watched: false,
-    backedUp: true,
-    mediaNumber: "M001", // Same as The Dark Knight
-    poster: "/placeholder.svg",
-    rating: 8.4,
-    fileSize: "9.1 GB",
-    director: "Christopher Nolan",
-    language: "English",
-    onlineRating: "8.4/10",
-    userRating: 7.5,
-    description: "Eight years after the Joker's reign of anarchy, Batman, with the help of the enigmatic Catwoman, is forced from his exile to save Gotham City from the brutal guerrilla terrorist Bane.",
-    cast: [
-      { character: "Batman/Bruce Wayne", actor: "Christian Bale" },
-      { character: "Bane", actor: "Tom Hardy" },
-      { character: "Catwoman", actor: "Anne Hathaway" }
-    ]
-  },
-  {
-    id: "7",
-    title: "Batman Begins",
-    type: "movie" as const,
-    year: 2005,
-    genre: ["Action", "Drama"],
-    quality: "1080p",
-    watched: true,
-    backedUp: true,
-    mediaNumber: "M001", // Same as The Dark Knight
-    poster: "/placeholder.svg",
-    rating: 8.2,
-    fileSize: "6.8 GB",
-    director: "Christopher Nolan",
-    language: "English",
-    onlineRating: "8.2/10",
-    userRating: 8.0,
-    description: "After training with his mentor, Batman begins his fight to free crime-ridden Gotham City from corruption.",
-    cast: [
-      { character: "Batman/Bruce Wayne", actor: "Christian Bale" },
-      { character: "Henri Ducard", actor: "Liam Neeson" },
-      { character: "Rachel Dawes", actor: "Katie Holmes" }
-    ]
-  }
-];
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 
 const MediaDetailsPage = () => {
   const { id } = useParams();
-  const [mediaItems, setMediaItems] = useState(mockMediaData);
-  
-  const media = mediaItems.find(item => item.id === id);
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [media, setMedia] = useState<any>(null);
+  const [allMediaItems, setAllMediaItems] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
 
-  const handleToggleWatched = (mediaId: string) => {
-    setMediaItems(items =>
-      items.map(item =>
-        item.id === mediaId ? { ...item, watched: !item.watched } : item
-      )
-    );
+  useEffect(() => {
+    if (user && id) {
+      fetchMediaDetails();
+      fetchAllMedia();
+    }
+  }, [user, id]);
+
+  const fetchMediaDetails = async () => {
+    try {
+      setIsLoading(true);
+      
+      // Fetch the specific media item
+      const { data: mediaData, error: mediaError } = await supabase
+        .from('media')
+        .select('*')
+        .eq('id', id)
+        .maybeSingle();
+
+      if (mediaError) throw mediaError;
+      
+      if (!mediaData) {
+        setNotFound(true);
+        return;
+      }
+
+      // Fetch episodes for this media item
+      const { data: episodesData } = await supabase
+        .from('episodes')
+        .select('*')
+        .eq('media_id', mediaData.id)
+        .order('season', { ascending: true })
+        .order('episode', { ascending: true });
+
+      // Map database format to UI format
+      const typeMap: Record<string, string> = {
+        "Movie": "movie",
+        "TV Series": "tv-series",
+        "Mini Series": "mini-series"
+      };
+
+      const formattedMedia = {
+        id: mediaData.id,
+        title: mediaData.title,
+        type: typeMap[mediaData.type] || mediaData.type.toLowerCase(),
+        genre: mediaData.genres || [],
+        quality: mediaData.quality || "N/A",
+        watched: mediaData.seen,
+        backedUp: mediaData.backed_up,
+        mediaNumber: mediaData.media_number,
+        poster: mediaData.poster_url || "/placeholder.svg",
+        cast: mediaData.cast_members || [],
+        edition: mediaData.edition,
+        imdbUrl: mediaData.imdb_url,
+        tmdbUrl: mediaData.tmdb_url,
+        year: new Date().getFullYear(), // You may want to add a year column
+        episodes: episodesData?.map(ep => ({
+          season: ep.season,
+          episode: ep.episode,
+          title: ep.title || `Episode ${ep.episode}`,
+          plot: "",
+          watched: ep.seen,
+          backedUp: ep.backed_up
+        })) || []
+      };
+
+      setMedia(formattedMedia);
+    } catch (error: any) {
+      console.error('Error fetching media details:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load media details",
+        variant: "destructive",
+      });
+      setNotFound(true);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleToggleBackup = (mediaId: string) => {
-    setMediaItems(items =>
-      items.map(item =>
-        item.id === mediaId ? { ...item, backedUp: !item.backedUp } : item
-      )
-    );
+  const fetchAllMedia = async () => {
+    try {
+      const { data: mediaData, error: mediaError } = await supabase
+        .from('media')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (mediaError) throw mediaError;
+
+      const typeMap: Record<string, string> = {
+        "Movie": "movie",
+        "TV Series": "tv-series",
+        "Mini Series": "mini-series"
+      };
+
+      const formattedMedia = (mediaData || []).map(item => ({
+        id: item.id,
+        title: item.title,
+        type: typeMap[item.type] || item.type.toLowerCase(),
+        genre: item.genres || [],
+        quality: item.quality,
+        watched: item.seen,
+        backedUp: item.backed_up,
+        mediaNumber: item.media_number,
+        poster: item.poster_url || "/placeholder.svg",
+        year: new Date().getFullYear(),
+      }));
+
+      setAllMediaItems(formattedMedia);
+    } catch (error: any) {
+      console.error('Error fetching all media:', error);
+    }
   };
 
-  const handleUpdateMedia = (updatedMedia: any) => {
-    setMediaItems(items =>
-      items.map(item =>
-        item.id === updatedMedia.id ? { ...item, ...updatedMedia } : item
-      )
-    );
+  const handleToggleWatched = async (mediaId: string) => {
+    try {
+      const currentWatchedStatus = media?.watched;
+      
+      const { error } = await supabase
+        .from('media')
+        .update({ seen: !currentWatchedStatus })
+        .eq('id', mediaId);
+
+      if (error) throw error;
+
+      setMedia((prev: any) => ({ ...prev, watched: !currentWatchedStatus }));
+      
+      toast({
+        title: "Success",
+        description: `Marked as ${!currentWatchedStatus ? 'watched' : 'unwatched'}`,
+      });
+    } catch (error: any) {
+      console.error('Error toggling watched status:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update watched status",
+        variant: "destructive",
+      });
+    }
   };
 
-  if (!media) {
+  const handleToggleBackup = async (mediaId: string) => {
+    try {
+      const currentBackupStatus = media?.backedUp;
+      
+      const { error } = await supabase
+        .from('media')
+        .update({ backed_up: !currentBackupStatus })
+        .eq('id', mediaId);
+
+      if (error) throw error;
+
+      setMedia((prev: any) => ({ ...prev, backedUp: !currentBackupStatus }));
+      
+      toast({
+        title: "Success",
+        description: `Marked as ${!currentBackupStatus ? 'backed up' : 'not backed up'}`,
+      });
+    } catch (error: any) {
+      console.error('Error toggling backup status:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update backup status",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleUpdateMedia = async (updatedMedia: any) => {
+    try {
+      const { error } = await supabase
+        .from('media')
+        .update({
+          title: updatedMedia.title,
+          genres: updatedMedia.genre,
+          quality: updatedMedia.quality,
+          media_number: updatedMedia.mediaNumber,
+          edition: updatedMedia.edition,
+        })
+        .eq('id', updatedMedia.id);
+
+      if (error) throw error;
+
+      setMedia(updatedMedia);
+      
+      toast({
+        title: "Success",
+        description: "Media updated successfully",
+      });
+    } catch (error: any) {
+      console.error('Error updating media:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update media",
+        variant: "destructive",
+      });
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <p className="text-center text-muted-foreground">Loading media details...</p>
+      </div>
+    );
+  }
+
+  if (notFound || !media) {
     return <NotFound />;
   }
 
   return (
     <MediaDetails
       media={media}
-      allMediaItems={mediaItems}
+      allMediaItems={allMediaItems}
       onToggleWatched={handleToggleWatched}
       onToggleBackup={handleToggleBackup}
       onUpdateMedia={handleUpdateMedia}
